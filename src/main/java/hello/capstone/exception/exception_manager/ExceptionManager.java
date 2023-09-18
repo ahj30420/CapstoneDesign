@@ -20,7 +20,7 @@ public class ExceptionManager {
              .body(Response.error(e.getMessage()));
  }
 
- // (2) 기존에 만들어둔 에러(HospitalReviewAppException)가 발생시 동작
+ // (2) 기존에 만들어둔 에러(SignUpException)가 발생시 동작
  @ExceptionHandler(SignUpException.class)
  public ResponseEntity<?> SignUpExceptionHandler(SignUpException e){
      return ResponseEntity.status(e.getErrorCode().getStatus())

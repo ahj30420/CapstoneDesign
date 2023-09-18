@@ -35,7 +35,7 @@ public class LoginService {
 		
 		long miliseconds = System.currentTimeMillis();
 		Date redate = new Date(miliseconds);
-		member.setNickname("닉네임");
+		member.setNickname(createRandomNickname());
 		member.setSocial("일반");
 		member.setRedate(redate);
 		
