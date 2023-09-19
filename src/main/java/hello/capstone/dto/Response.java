@@ -13,8 +13,8 @@ public class Response<T> {
 
 
     //  Service에서 데이터가 중복이 되었다면 오류 처리를 하는데
-    public static Response<Void> error(String resultCode){
-        return new Response(resultCode,null);
+    public static <T> Response<T> error(String resultCode, T result){
+        return new Response(resultCode, result);
     }
 
     // Controller에서 반환할때 한번 감싸서 반환해줌(성공했다는 메시지와 result 결과 데이터와 같이)

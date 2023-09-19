@@ -9,7 +9,8 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-	DUPLICATED_USER_ID(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다.");
+	DUPLICATED_USER_ID(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
+	PASSWORD_MISMATCH(HttpStatus.CONFLICT, "패스워드가 틀렸습니다.");
 	
 	private HttpStatus status;
 	private String message;

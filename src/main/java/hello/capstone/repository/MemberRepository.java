@@ -16,12 +16,12 @@ public class MemberRepository {
    public final LoginMapper loginMapper;
    /*
     * 회원정보저장 마지막수정 09/18 23시 20분
-    * save() 반환값 int로 변경
+    * save() 반환값 boolean로 변경
     */
-   public int save(Member member) {
+   public boolean save(Member member) {
       
       loginMapper.save(member);
-      return 1;
+      return true;
    }
    /*
     * 아이디로 회원 검색 마지막수정 09/15 16시 41분

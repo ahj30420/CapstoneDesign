@@ -1,16 +1,30 @@
 package hello.capstone.service;
 
 import com.google.gson.JsonParser;
+
+import hello.capstone.dto.NaverOauthParams;
+import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
+@Slf4j
 @Service
 public class OAuthService{
 
@@ -18,7 +32,7 @@ public class OAuthService{
         String access_Token = "";
         String refresh_Token = "";
         String reqURL = "https://kauth.kakao.com/oauth/token";
-
+        
         try {
             URL url = new URL(reqURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -115,5 +129,74 @@ public class OAuthService{
         
         return userInfo;
     }
+    
+    public ResponseEntity<String> getNaverAccessToken(String code, String state) {
+    	 // RestTemplate 인스턴스 생성
+        RestTemplate rt = new RestTemplate();
 
+        HttpHeaders accessTokenHeaders = new HttpHeaders();
+        accessTokenHeaders.add("Content-type", "application/x-www-form-urlencoded");
+
+        MultiValueMap<String, String> accessTokenParams = new LinkedMultiValueMap<>();
+        accessTokenParams.add("grant_type", "authorization_code");
+        accessTokenParams.add("client_id", "rmptq4twehWBueMreZ2L");
+        accessTokenParams.add("client_secret", "Vr7_Qu_Nhs");
+        accessTokenParams.add("code" , code);	// 응답으로 받은 코드
+        accessTokenParams.add("state" , state); // 응답으로 받은 상태
+
+        HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(accessTokenParams, accessTokenHeaders);
+
+        ResponseEntity<String> accessTokenResponse = rt.exchange(
+                "https://nid.naver.com/oauth2.0/token",
+                HttpMethod.POST,
+                accessTokenRequest,
+                String.class
+        );
+        
+        return accessTokenResponse;
+    }
+
+    public String getNaverInfo (ResponseEntity<String> accessTokenResponse){
+    	RestTemplate rt = new RestTemplate();
+    	
+    	// 이전에 받았던 Access Token 응답 
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // json -> 객체로 매핑하기 위해 NaverOauthParams 클래스 생성
+        NaverOauthParams naverOauthParams = null;
+        try {
+            naverOauthParams = objectMapper.readValue(accessTokenResponse.getBody(), NaverOauthParams.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        
+        // header를 생성해서 access token을 넣어줍니다.
+        HttpHeaders profileRequestHeader = new HttpHeaders();
+        profileRequestHeader.add("Authorization", "Bearer " + naverOauthParams.getAccess_token());
+        
+        HttpEntity<HttpHeaders> profileHttpEntity = new HttpEntity<>(profileRequestHeader);
+        
+        // profile api로 생성해둔 헤더를 담아서 요청을 보냅니다.
+        ResponseEntity<String> profileResponse = rt.exchange(
+                "https://openapi.naver.com/v1/nid/me",
+                HttpMethod.POST,
+                profileHttpEntity,
+                String.class
+        );
+		
+		 JsonParser parser = new JsonParser(); 
+		 JsonElement element = parser.parse(profileResponse.getBody());
+		  
+		 JsonObject properties = element.getAsJsonObject().get("response").getAsJsonObject();
+
+		 String name = properties.getAsJsonObject().get("name").getAsString();
+		 String email = properties.getAsJsonObject().get("email").getAsString();
+		 String phone = properties.getAsJsonObject().get("mobile").getAsString();
+        
+        log.info("info={}", profileResponse.getBody());
+        log.info("name={}",name);
+        
+    	return "profile response : " + profileResponse.getBody(); 
+    } 
+    
 }

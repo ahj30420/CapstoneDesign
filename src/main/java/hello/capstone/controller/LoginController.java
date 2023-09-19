@@ -30,10 +30,10 @@ public class LoginController {
 	/*
 	 * 마지막수정 09/18 23시 20분 
 	 * @RequestBody
-	 * sign_up 반환값 int로 변경
+	 * sign_up 반환값 boolean로 변경
 	 * */
     @PostMapping("/join")
-    public int sign_up(@RequestBody Member member ){
+    public boolean sign_up(@RequestBody Member member ){
     	
     	log.info("id ={}",member.getId());
     	log.info("pw={}",member.getPw());
@@ -41,12 +41,20 @@ public class LoginController {
     	log.info("phone={}",member.getPhone());
     	log.info("role={}",member.getRole());
     	
-    	int success = loginService.signUp(member);
+    	boolean success = loginService.signUp(member);
     	return success;
-    }
+    }  
+	/* 테스트용
+	 * @GetMapping("/join2") public boolean sign_up2(@ModelAttribute Member member){
+	 * 
+	 * log.info("id ={}",member.getId()); log.info("pw={}",member.getPw());
+	 * log.info("name ={}",member.getName());
+	 * log.info("phone={}",member.getPhone()); log.info("role={}",member.getRole());
+	 * 
+	 * boolean success = loginService.signUp(member); return success; }
+	 */
     
-    
-    @PostMapping("login_attempt")
+    @PostMapping("/login_attempt")
     public String login(@RequestBody HashMap<String, Object> loginMap, HttpServletRequest request) {
        String id = (String) loginMap.get("id");
        String pw = (String) loginMap.get("pw");
@@ -57,11 +65,6 @@ public class LoginController {
        Member userMember = loginService.login(id, pw);
        HttpSession session = request.getSession();
        
-       if(userMember == null) {
-          log.info("login = {}", "fail");
-         return "fail";
-      }
-       
        session.setAttribute("id", userMember.getId());
        session.setAttribute("name", userMember.getName());
        session.setAttribute("nickname", userMember.getNickname());
@@ -71,5 +74,20 @@ public class LoginController {
        
        return "/home";
     }
-
+	/*테스트용
+	 * @GetMapping("/login_attempt2") public String login(@RequestParam String
+	 * id, @RequestParam String pw, HttpServletRequest request) {
+	 * 
+	 * if(id.isEmpty()) { return "redirect:/login"; } Member userMember =
+	 * loginService.login(id, pw); HttpSession session = request.getSession();
+	 * 
+	 * session.setAttribute("id", userMember.getId()); session.setAttribute("name",
+	 * userMember.getName()); session.setAttribute("nickname",
+	 * userMember.getNickname());
+	 * 
+	 * log.info("loginId={}",userMember.getId());
+	 * log.info("loginName={}",userMember.getName());
+	 * 
+	 * return "/home"; }
+	 */
 }
