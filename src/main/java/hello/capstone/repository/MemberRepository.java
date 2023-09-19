@@ -23,17 +23,23 @@ public class MemberRepository {
       loginMapper.save(member);
       return true;
    }
+   
    /*
-    * 아이디로 회원 검색 마지막수정 09/15 16시 41분
-    * */
-   public Member findById(String Id) {
-	   Member findMember = loginMapper.findbyid(Id);
-	   
-	   return findMember;
+    * 카카오회원정보저장
+    */
+   public boolean saveSocial(Member member) {
+      loginMapper.saveSocial(member);
+      return true;
    }
    
    
-   
-   
+   /*
+    * 아이디로 회원 검색 마지막수정 09/15 16시 41분
+    * */
+   public Member findById(String id, String social) {
+	   Member findMember = loginMapper.findbyid(id,social);
+	   
+	   return findMember;
+   }
    
 }

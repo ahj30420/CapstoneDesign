@@ -32,7 +32,7 @@ public class OAuthService{
         String access_Token = "";
         String refresh_Token = "";
         String reqURL = "https://kauth.kakao.com/oauth/token";
-        
+
         try {
             URL url = new URL(reqURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -46,7 +46,7 @@ public class OAuthService{
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id=2874c74d0b5306bd4c7cf2485f045577"); // TODO REST_API_KEY 입력
-            sb.append("&redirect_uri=http://localhost:3000/login/oauth2/loading"); // TODO 인가코드 받은 redirect_uri 입력
+            sb.append("&redirect_uri=http://localhost:3000/login/oauth2/Kakao_loading"); // TODO 인가코드 받은 redirect_uri 입력
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
@@ -66,8 +66,10 @@ public class OAuthService{
             System.out.println("response body : " + result);
 
             //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
-			JsonParser parser = new JsonParser();
-            JsonElement element = parser.parse(result);
+            @SuppressWarnings("deprecation")
+         JsonParser parser = new JsonParser();
+            @SuppressWarnings("deprecation")
+         JsonElement element = parser.parse(result);
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
             refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
@@ -83,7 +85,6 @@ public class OAuthService{
 
         return access_Token;
     }
-    
     public HashMap<String, Object> getUserInfo (String access_Token) {
         
         //    요청하는 클라이언트마다 가진 정보가 다를 수 있기에 HashMap타입으로 선언
@@ -131,72 +132,78 @@ public class OAuthService{
     }
     
     public ResponseEntity<String> getNaverAccessToken(String code, String state) {
-    	 // RestTemplate 인스턴스 생성
-        RestTemplate rt = new RestTemplate();
+          // RestTemplate 인스턴스 생성
+          RestTemplate rt = new RestTemplate();
 
-        HttpHeaders accessTokenHeaders = new HttpHeaders();
-        accessTokenHeaders.add("Content-type", "application/x-www-form-urlencoded");
+          HttpHeaders accessTokenHeaders = new HttpHeaders();
+          accessTokenHeaders.add("Content-type", "application/x-www-form-urlencoded");
 
-        MultiValueMap<String, String> accessTokenParams = new LinkedMultiValueMap<>();
-        accessTokenParams.add("grant_type", "authorization_code");
-        accessTokenParams.add("client_id", "rmptq4twehWBueMreZ2L");
-        accessTokenParams.add("client_secret", "Vr7_Qu_Nhs");
-        accessTokenParams.add("code" , code);	// 응답으로 받은 코드
-        accessTokenParams.add("state" , state); // 응답으로 받은 상태
+          MultiValueMap<String, String> accessTokenParams = new LinkedMultiValueMap<>();
+          accessTokenParams.add("grant_type", "authorization_code");
+          accessTokenParams.add("client_id", "rmptq4twehWBueMreZ2L");
+          accessTokenParams.add("client_secret", "Vr7_Qu_Nhs");
+          accessTokenParams.add("code" , code);   // 응답으로 받은 코드
+          accessTokenParams.add("state" , state); // 응답으로 받은 상태
 
-        HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(accessTokenParams, accessTokenHeaders);
+          HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(accessTokenParams, accessTokenHeaders);
 
-        ResponseEntity<String> accessTokenResponse = rt.exchange(
-                "https://nid.naver.com/oauth2.0/token",
-                HttpMethod.POST,
-                accessTokenRequest,
-                String.class
-        );
-        
-        return accessTokenResponse;
-    }
+          ResponseEntity<String> accessTokenResponse = rt.exchange(
+                  "https://nid.naver.com/oauth2.0/token",
+                  HttpMethod.POST,
+                  accessTokenRequest,
+                  String.class
+          );
+          
+          return accessTokenResponse;
+      }
 
-    public String getNaverInfo (ResponseEntity<String> accessTokenResponse){
-    	RestTemplate rt = new RestTemplate();
-    	
-    	// 이전에 받았던 Access Token 응답 
-        ObjectMapper objectMapper = new ObjectMapper();
-        
-        // json -> 객체로 매핑하기 위해 NaverOauthParams 클래스 생성
-        NaverOauthParams naverOauthParams = null;
-        try {
-            naverOauthParams = objectMapper.readValue(accessTokenResponse.getBody(), NaverOauthParams.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        
-        // header를 생성해서 access token을 넣어줍니다.
-        HttpHeaders profileRequestHeader = new HttpHeaders();
-        profileRequestHeader.add("Authorization", "Bearer " + naverOauthParams.getAccess_token());
-        
-        HttpEntity<HttpHeaders> profileHttpEntity = new HttpEntity<>(profileRequestHeader);
-        
-        // profile api로 생성해둔 헤더를 담아서 요청을 보냅니다.
-        ResponseEntity<String> profileResponse = rt.exchange(
-                "https://openapi.naver.com/v1/nid/me",
-                HttpMethod.POST,
-                profileHttpEntity,
-                String.class
-        );
-		
-		 JsonParser parser = new JsonParser(); 
-		 JsonElement element = parser.parse(profileResponse.getBody());
-		  
-		 JsonObject properties = element.getAsJsonObject().get("response").getAsJsonObject();
+      public HashMap<String, Object> getNaverInfo (ResponseEntity<String> accessTokenResponse){
+         RestTemplate rt = new RestTemplate();
+         
+         // 이전에 받았던 Access Token 응답 
+          ObjectMapper objectMapper = new ObjectMapper();
+          
+          // json -> 객체로 매핑하기 위해 NaverOauthParams 클래스 생성
+          NaverOauthParams naverOauthParams = null;
+          try {
+              naverOauthParams = objectMapper.readValue(accessTokenResponse.getBody(), NaverOauthParams.class);
+          } catch (JsonProcessingException e) {
+              e.printStackTrace();
+          }
+          
+          // header를 생성해서 access token을 넣어줍니다.
+          HttpHeaders profileRequestHeader = new HttpHeaders();
+          profileRequestHeader.add("Authorization", "Bearer " + naverOauthParams.getAccess_token());
+          
+          HttpEntity<HttpHeaders> profileHttpEntity = new HttpEntity<>(profileRequestHeader);
+          
+          // profile api로 생성해둔 헤더를 담아서 요청을 보냅니다.
+          ResponseEntity<String> profileResponse = rt.exchange(
+                  "https://openapi.naver.com/v1/nid/me",
+                  HttpMethod.POST,
+                  profileHttpEntity,
+                  String.class
+          );
+         
+          JsonParser parser = new JsonParser(); 
+          JsonElement element = parser.parse(profileResponse.getBody());
+           
+          JsonObject properties = element.getAsJsonObject().get("response").getAsJsonObject();
 
-		 String name = properties.getAsJsonObject().get("name").getAsString();
-		 String email = properties.getAsJsonObject().get("email").getAsString();
-		 String phone = properties.getAsJsonObject().get("mobile").getAsString();
-        
-        log.info("info={}", profileResponse.getBody());
-        log.info("name={}",name);
-        
-    	return "profile response : " + profileResponse.getBody(); 
-    } 
+          String name = properties.getAsJsonObject().get("name").getAsString();
+          String email = properties.getAsJsonObject().get("email").getAsString();
+          String phone = properties.getAsJsonObject().get("mobile").getAsString();
+          
+         log.info("name={}",name);
+         log.info("email={}",email);
+         log.info("phone={}",phone);
+         
+         HashMap<String, Object> naverInfo = new HashMap<String, Object>();
+         naverInfo.put("name", name);
+         naverInfo.put("id", email);
+         naverInfo.put("phone", phone);
+          
+         return naverInfo; 
+      } 
     
 }
