@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.capstone.repository.ShopMapper">
+    
+
+	<select id="findByAddress" resultType ="Shop">
+		select * from shop where shopaddress = #{address} Limit 1;
+	</select>
+	
+	<insert id="saveShop">
+      insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, #{registrationDate});
+	</insert>
+
+</mapper>

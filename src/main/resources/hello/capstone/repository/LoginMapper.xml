@@ -2,17 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="hello.capstone.repository.LoginMapper">
-	
-	<insert id = "save">
-		insert into member(id, pw, name, nickname, phone, social, role, redate) values(#{id}, #{pw}, #{name}, #{nickname}, #{phone}, #{social}, #{role}, #{redate})
-	</insert>
-	
-	<insert id = "saveSocial">
-     	insert into member(id, pw, name, nickname, social, role, redate) values(#{id}, #{pw}, #{name}, #{nickname}, #{social}, #{role}, #{redate})
+   
+   <insert id = "save">
+      insert into member(id, pw, name, nickname,phone, social,  role, redate) values(#{id}, #{pw}, #{name}, #{nickname},#{phone}, #{social}, #{role}, #{redate})
+   </insert>
+   
+   <insert id = "saveSocial">
+      insert into member(id, pw, name, nickname, social, phone, role, redate) values(#{id}, #{pw}, #{name}, #{nickname}, #{social}, #{phone}, #{role}, #{redate})
    </insert>
 
 	<select id="findbyid" resultType ="Member">
 		select * from member where id = #{id} and social = #{social} Limit 1;
 	</select>
+	
+	<select id="getMeberIdx">
+		select memberidx from member where id = #{id} and social = #{social};
+	</select>
+	
+	
+	
 
 </mapper>

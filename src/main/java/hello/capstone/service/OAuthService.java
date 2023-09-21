@@ -27,7 +27,7 @@ import java.util.HashMap;
 @Slf4j
 @Service
 public class OAuthService{
-
+	
     public String getKakaoAccessToken (String code) {
         String access_Token = "";
         String refresh_Token = "";
@@ -67,9 +67,9 @@ public class OAuthService{
 
             //Gson 라이브러리에 포함된 클래스로 JSON파싱 객체 생성
             @SuppressWarnings("deprecation")
-         JsonParser parser = new JsonParser();
+			JsonParser parser = new JsonParser();
             @SuppressWarnings("deprecation")
-         JsonElement element = parser.parse(result);
+			JsonElement element = parser.parse(result);
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
             refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
@@ -132,7 +132,7 @@ public class OAuthService{
     }
     
     public ResponseEntity<String> getNaverAccessToken(String code, String state) {
-          // RestTemplate 인스턴스 생성
+      	 // RestTemplate 인스턴스 생성
           RestTemplate rt = new RestTemplate();
 
           HttpHeaders accessTokenHeaders = new HttpHeaders();
@@ -142,7 +142,7 @@ public class OAuthService{
           accessTokenParams.add("grant_type", "authorization_code");
           accessTokenParams.add("client_id", "rmptq4twehWBueMreZ2L");
           accessTokenParams.add("client_secret", "Vr7_Qu_Nhs");
-          accessTokenParams.add("code" , code);   // 응답으로 받은 코드
+          accessTokenParams.add("code" , code);	// 응답으로 받은 코드
           accessTokenParams.add("state" , state); // 응답으로 받은 상태
 
           HttpEntity<MultiValueMap<String, String>> accessTokenRequest = new HttpEntity<>(accessTokenParams, accessTokenHeaders);
@@ -158,9 +158,9 @@ public class OAuthService{
       }
 
       public HashMap<String, Object> getNaverInfo (ResponseEntity<String> accessTokenResponse){
-         RestTemplate rt = new RestTemplate();
-         
-         // 이전에 받았던 Access Token 응답 
+      	RestTemplate rt = new RestTemplate();
+      	
+      	// 이전에 받았던 Access Token 응답 
           ObjectMapper objectMapper = new ObjectMapper();
           
           // json -> 객체로 매핑하기 위해 NaverOauthParams 클래스 생성
@@ -184,15 +184,15 @@ public class OAuthService{
                   profileHttpEntity,
                   String.class
           );
-         
-          JsonParser parser = new JsonParser(); 
-          JsonElement element = parser.parse(profileResponse.getBody());
-           
-          JsonObject properties = element.getAsJsonObject().get("response").getAsJsonObject();
+   		
+   		 JsonParser parser = new JsonParser(); 
+   		 JsonElement element = parser.parse(profileResponse.getBody());
+   		  
+   		 JsonObject properties = element.getAsJsonObject().get("response").getAsJsonObject();
 
-          String name = properties.getAsJsonObject().get("name").getAsString();
-          String email = properties.getAsJsonObject().get("email").getAsString();
-          String phone = properties.getAsJsonObject().get("mobile").getAsString();
+   		 String name = properties.getAsJsonObject().get("name").getAsString();
+   		 String email = properties.getAsJsonObject().get("email").getAsString();
+   		 String phone = properties.getAsJsonObject().get("mobile").getAsString();
           
          log.info("name={}",name);
          log.info("email={}",email);
@@ -203,7 +203,7 @@ public class OAuthService{
          naverInfo.put("id", email);
          naverInfo.put("phone", phone);
           
-         return naverInfo; 
+      	return naverInfo; 
       } 
     
 }
