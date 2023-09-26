@@ -21,7 +21,7 @@ public class ShopService {
 	private final ShopRepository shopRepository;
 	
 	public boolean saveShop(Shop shop) {
-		
+		shop.setShopAddress("c");
 		//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
 		Optional.ofNullable(shopRepository.findByAddress(shop.getShopAddress()))
 			.ifPresent(user->{
@@ -31,11 +31,13 @@ public class ShopService {
 		long miliseconds = System.currentTimeMillis();
 		Date registrationDate = new Date(miliseconds);
 		shop.setRegistrationDate(registrationDate);
-		shop.setOwnerIdx(1);
-		shop.setShopAddress("a");
 		
-		log.info("ShopService - shop = {}", shop);
 		
 		return shopRepository.saveShop(shop);
+	}
+	
+	public int getShopIdx(Shop shop) {
+		int idx = shopRepository.getShopIdx(shop);
+		return idx;
 	}
 }

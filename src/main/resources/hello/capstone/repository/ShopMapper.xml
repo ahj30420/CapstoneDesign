@@ -11,5 +11,10 @@
 	<insert id="saveShop">
       insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, #{registrationDate});
 	</insert>
-
+	
+	<select id="getShopIdx">
+		select shopidx from shop where shopname = #{id} and shopaddress = #{shopaddress};
+	</select>
+	
+	
 </mapper>

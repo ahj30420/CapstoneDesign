@@ -34,6 +34,7 @@ dependencies {
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.2'
 	implementation 'com.google.code.gson:gson:2.8.7'
 	implementation 'org.apache.commons:commons-lang3:3.0'
+	implementation 'net.nurigo:sdk:4.2.7'
 }
 
 tasks.named('test') {

@@ -30,4 +30,13 @@ public class ShopRepository {
 		shopMapper.saveShop(shop);
 		return true;
 	}
+	
+	/*
+	 * shop 인덱스조회
+	 */
+	public int getShopIdx(Shop shop) {
+		   int idx = shopMapper.getShopIdx(shop);
+	  
+		   return idx;
+	}
 }

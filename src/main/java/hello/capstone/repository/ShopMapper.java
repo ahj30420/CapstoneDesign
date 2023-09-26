@@ -13,4 +13,5 @@ public interface ShopMapper {
    
    void saveShop(Shop shop);
   
+   int getShopIdx(Shop shop);
 }

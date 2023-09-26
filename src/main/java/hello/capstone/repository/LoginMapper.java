@@ -17,4 +17,8 @@ public interface LoginMapper {
    Member findbyid(@Param("id") String id, @Param("social") String social);  
     
    int getMeberIdx(Member member);
+   
+   Member findbyname_phone(@Param("name") String name, @Param("phone") String phone, @Param("social") String social);
+   
+   void updatepw(@Param("id") String id, @Param("pw") String pw, @Param("social") String social);
 }

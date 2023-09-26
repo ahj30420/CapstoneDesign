@@ -19,7 +19,11 @@
 		select memberidx from member where id = #{id} and social = #{social};
 	</select>
 	
+	<select id="findbyname_phone" resultType ="Member">
+		select * from member where name = #{name} and phone = #{phone} and social = #{social} Limit 1;
+	</select>
 	
-	
-
+	<update id = "updatepw">
+		update member set pw = #{pw} where id = #{id} and social = #{social};
+	</update>
 </mapper>
