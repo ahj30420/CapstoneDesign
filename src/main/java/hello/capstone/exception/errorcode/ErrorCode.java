@@ -16,7 +16,8 @@ public enum ErrorCode {
 	PHONE_MISMATCH(HttpStatus.CONFLICT, "해당 정보와 핸드폰 번호가 일치하지 않습니다."),
 	Code_MISMATCH(HttpStatus.CONFLICT, "인증번호가 틀렸습니다."),
 	ALREADY_BOOKMARKED_SHOP(HttpStatus.CONFLICT, "이미 즐겨찾기를 한 가게 입니다."),
-	NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS(HttpStatus.CONFLICT, "기존 닉네임과 다른 15글자 이내에 닉네임을 입력하세요.");
+	NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS(HttpStatus.CONFLICT, "기존 닉네임과 다른 15글자 이내에 닉네임을 입력하세요."),
+	DUPLICATED_ITEM(HttpStatus.CONFLICT, "이미 등록된 상품입니다.");
 	
 	private HttpStatus status;
 	private String message;

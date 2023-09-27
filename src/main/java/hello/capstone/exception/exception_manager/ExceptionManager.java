@@ -70,9 +70,16 @@ public class ExceptionManager {
 	}
 	
 	//(9) 기존에 만들어둔 에러(CodeVerificationException)가 발생시 동작
-			@ExceptionHandler(CodeVerificationException.class)
-			public ResponseEntity<?> CodeVerificationExceptionHandler(CodeVerificationException e){
-			   return ResponseEntity.status(e.getErrorCode().getStatus())
-			           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
-		}
+	@ExceptionHandler(CodeVerificationException.class)
+	public ResponseEntity<?> CodeVerificationExceptionHandler(CodeVerificationException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
+
+	//(10) 기존에 만들어둔 에러(SaveItemException)가 발생시 동작
+	@ExceptionHandler(SaveItemException.class)
+	public ResponseEntity<?> SaveItemExceptionHandler(SaveItemException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
 }

@@ -1,5 +1,7 @@
 package hello.capstone.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import hello.capstone.dto.Shop;
@@ -38,5 +40,12 @@ public class ShopRepository {
 		   int idx = shopMapper.getShopIdx(shop);
 	  
 		   return idx;
+	}
+	
+	/*
+	 * shop Mark표시 테스트
+	 */
+	public List<Shop> getShops(){
+		return shopMapper.getShops();
 	}
 }

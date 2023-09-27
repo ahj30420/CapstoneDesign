@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -143,7 +144,7 @@ public class LoginController {
     	HttpSession session = request.getSession();
     	if(code.equals(session.getAttribute("code")) && session.getAttribute("findpw_member") != null) {
     		session.removeAttribute("code");
-    		return "success";
+    		return "/pw_result";
     	}
     	else {
     		throw new CodeVerificationException(ErrorCode.Code_MISMATCH,null);
@@ -168,11 +169,12 @@ public class LoginController {
     /*
      * 비밀번호 새 설정
      */
-    @GetMapping("/updatepw")
-    public String updatepw(@RequestParam String pw, HttpServletRequest request) {
+    @PutMapping("/updatepw")
+    public String updatepw(@RequestBody HashMap<String,String> pw, HttpServletRequest request) {
+    	String password = pw.get("pw");
     	HttpSession session = request.getSession();
     	Member member = (Member)session.getAttribute("findpw_member");
-    	memberService.updatepw(member.getId(),pw);
+    	memberService.updatepw(member.getId(),password);
     	session.removeAttribute("findpw_member");
     	return "/login";
     }

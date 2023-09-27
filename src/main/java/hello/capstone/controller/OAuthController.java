@@ -94,7 +94,7 @@ public class OAuthController {
     	    	
     	HttpSession session = request.getSession();
     	session.setAttribute("member", naverMember);
-    		
+    	log.info("Naver_member = {}",naverMember);
     	return "/home_user";   
     }
     
