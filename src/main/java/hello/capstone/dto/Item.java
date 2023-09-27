@@ -21,4 +21,6 @@ public class Item {
 	private Date starttime;
 	private Date endtime;
 	
+	public Item() {}
+	
 }
