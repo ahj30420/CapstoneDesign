@@ -88,6 +88,21 @@ public class MemberRepository {
 	   memberMapper.updateNickname(member, nickname);
    }
    
+   /*
+    * 회원 탈퇴
+    */
+   public void deleteMember(Member member) {
+	   memberMapper.deleteMember(member);
+   }
+   
+   
+   /*
+    * 회원정보수정
+    */
+	public void updateMember(Member oldMember, Member newMember) {
+		memberMapper.updateMember(oldMember, newMember);
+	}
+   
    
    public void updatepw(String id, String pw, String social) {
 	   loginMapper.updatepw(id, pw, social);

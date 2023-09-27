@@ -61,4 +61,18 @@ public class ExceptionManager {
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
 	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
 	}
+	
+	//(8) 기존에 만들어둔 에러(NicknameException)가 발생시 동작
+	@ExceptionHandler(NicknameException.class)
+	public ResponseEntity<?> NicknameExceptionHandler(NicknameException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
+	
+	//(9) 기존에 만들어둔 에러(CodeVerificationException)가 발생시 동작
+			@ExceptionHandler(CodeVerificationException.class)
+			public ResponseEntity<?> CodeVerificationExceptionHandler(CodeVerificationException e){
+			   return ResponseEntity.status(e.getErrorCode().getStatus())
+			           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+		}
 }

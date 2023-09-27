@@ -22,4 +22,20 @@
 		where id = #{member.id,jdbcType=VARCHAR} and pw = #{member.pw,jdbcType=VARCHAR};
 	</update>
 
+	<update id = "updateMember">
+		update member
+
+		set nickname = #{newMember.nickname},
+			pw = #{newMember.pw},
+			phone = #{newMember.phone}
+		
+		where id = #{oldMember.id} and pw = #{oldMember.pw};
+	</update>
+
+	<delete id = "deleteMember">
+		delete from member
+
+		where id = #{id} and pw = #{pw};
+	</delete>
+
 </mapper>

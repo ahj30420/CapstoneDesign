@@ -17,4 +17,8 @@ public interface MemberMapper {
 	List<Shop> getMyBookmarkedShop(@Param("memberidx") int memberidx);
 	
 	void updateNickname(@Param("member") Member member, @Param("nickname") String nick);
+	
+	void deleteMember(Member member);
+	
+	void updateMember(@Param("oldMember") Member oldMember, @Param("newMember") Member newMember);
 }

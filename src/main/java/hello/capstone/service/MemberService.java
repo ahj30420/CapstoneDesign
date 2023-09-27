@@ -10,6 +10,7 @@ import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.FindPwException;
+import hello.capstone.exception.NicknameException;
 import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.repository.MemberRepository;
@@ -64,6 +65,34 @@ public class MemberService {
 		member.setNickname(nickname);
 		
 		return member;
+	}
+	
+	/*
+	 * 회원 탈퇴
+	 */
+	@Transactional
+	public void deleteMember(Member member) {
+		memberRepository.deleteMember(member);
+	}
+	
+	
+	/*
+	 * 회원정보 수정
+	 */
+	@Transactional
+	public Member updateMember(Member oldMember, Member newMember) {
+		
+		if(oldMember.getNickname().equals(newMember.getNickname()) || 
+				newMember.getNickname().length() > 15) {
+			throw new NicknameException(ErrorCode.NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS, null);
+		}
+		
+		memberRepository.updateMember(oldMember, newMember);
+		oldMember.setNickname(newMember.getNickname());
+		oldMember.setPw(newMember.getPw());
+		oldMember.setPhone(newMember.getPhone());
+		
+		return oldMember;
 	}
 	
 	/*

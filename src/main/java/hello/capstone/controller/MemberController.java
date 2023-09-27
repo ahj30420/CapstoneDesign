@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
+import hello.capstone.exception.LogInException;
+import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.service.MemberService;
 import hello.capstone.service.ShopService;
 import jakarta.servlet.http.HttpSession;
@@ -87,8 +89,11 @@ public class MemberController {
 	 * 회원정보 수정
 	 */
 	@PutMapping("/update/info")
-	public String updateInfo(@RequestBody Member newInfo, HttpSession session) {
+	public String updateInfo(@RequestBody Member newMember, HttpSession session) {
+		Member oldMember = (Member) session.getAttribute("member");
+		newMember = memberService.updateMember(oldMember, newMember);
 		
+		session.setAttribute("member", newMember);
 		
 		return "home_user";
 	}
@@ -97,12 +102,27 @@ public class MemberController {
 	/*
 	 * 회원 탈퇴
 	 */
-	@DeleteMapping("/update/info")
-	public String deleteMember(@RequestParam String id, @RequestParam String pw, HttpSession session) {
+	@DeleteMapping("/delete")
+	public String deleteMember(HttpSession session) {
+
+		Member member = (Member) session.getAttribute("member");
+		memberService.deleteMember(member);
 		
+		session.removeAttribute("member");
 		
 		return "login";
 	}
 	
+	/*
+	 * 비밀번호 일치 확인
+	 */
+	@GetMapping("/info/pwcheck")
+	public void passwordCheck(HttpSession session, @RequestParam("pw") String pw) {
+		
+		String realPw = ((Member)session.getAttribute("member")).getPw();
+		if(!(realPw.equals(pw))) {
+	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
+	      }
 	
+	}
 }

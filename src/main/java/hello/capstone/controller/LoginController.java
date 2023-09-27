@@ -165,15 +165,35 @@ public class LoginController {
     	}
     }
     
+    /*
+     * 비밀번호 새 설정
+     */
     @GetMapping("/updatepw")
     public String updatepw(@RequestParam String pw, HttpServletRequest request) {
     	HttpSession session = request.getSession();
     	Member member = (Member)session.getAttribute("findpw_member");
     	memberService.updatepw(member.getId(),pw);
-    	session.removeAttribute("find_member");
+    	session.removeAttribute("findpw_member");
     	return "/login";
     }
     
+    /*
+     * 아이디 찾기(이름, 휴대폰 인증 성공 후 실제로 아이디 정보 보여주기)
+     */
+    @GetMapping("/find_id")
+    public String showID(HttpServletRequest request) {
+    	HttpSession session = request.getSession();
+    	Member find_member = (Member)session.getAttribute("findid_member");
+    	String id = find_member.getId();
+    	log.info("find_member_ID = {}",id);
+    	session.removeAttribute("findid_member");
+    	return id;
+    }
+    
+    @GetMapping("/test")
+    public String test() {
+    	return "success";
+    }
     /*
      *-----------------------------------------------------------------------------------------------------
      *private 메소드
