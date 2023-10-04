@@ -1,6 +1,7 @@
 package hello.capstone.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,18 +37,21 @@ public class ShopService {
 	String kakaoLocalKey;
 	String uri = "https://dapi.kakao.com/v2/local/search/address.json";
 	
-	public boolean saveShop(Shop shop) {
+	public boolean saveShop(Shop shop, String method) {
 		
 		log.info("saveShop Start");
-		//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
-		Optional.ofNullable(shopRepository.findByAddress(shop.getShopAddress()))
-			.ifPresent(user->{
-				throw new SaveShopException(ErrorCode.DUPLICATED_SHOP,null);
-			});
 		
-		long miliseconds = System.currentTimeMillis();
-		Date registrationDate = new Date(miliseconds);
-		shop.setRegistrationDate(registrationDate);
+		if(method.equals("register")) {
+			//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
+			Optional.ofNullable(shopRepository.findByAddress(shop.getShopAddress()))
+				.ifPresent(user->{
+					throw new SaveShopException(ErrorCode.DUPLICATED_SHOP,null);
+				});
+			
+			long miliseconds = System.currentTimeMillis();
+			Date registrationDate = new Date(miliseconds);
+			shop.setRegistrationDate(registrationDate);
+		}
 
 		log.info("saveShop Middle");
 		
@@ -59,13 +63,13 @@ public class ShopService {
 		
 		log.info("shop info = {}", shop);
 		
-		return shopRepository.saveShop(shop);
+		return shopRepository.saveShop(shop,method);
 	}
 	
 	/*
 	 *  주소를 경도, 위도로 반환
 	 */
-	public Coordinates getCoordinate(String shop_address){
+	private Coordinates getCoordinate(String shop_address){
         RestTemplate restTemplate = new RestTemplate();
 
         String apiKey = "KakaoAK " + kakaoLocalKey;
@@ -105,4 +109,68 @@ public class ShopService {
 		int idx = shopRepository.getShopIdx(shop);
 		return idx;
 	}
+	
+	
+	/*
+	 * 상업자 버전
+	 */
+	public List<Shop> getShopByMember(int memberidx){
+		return shopRepository.getShopByMember(memberidx);
+		
+	}
+	
+	 /*
+	  * 거리필터가 적용된 가게 조회, 좌표 간 계산식 참고 출처 https://frontmaster.tistory.com/135
+	  */
+	 public List<Shop> runDistanceFilter(double latitude, double longitude, double distance, String unit){
+	    
+        List<Shop> shops = shopRepository.getShops();
+	    List<Shop> filteredShops = new ArrayList<Shop>();
+	      
+	    for (Shop shop : shops) {
+	       double shopLatitude = Double.parseDouble(shop.getLatitude());
+	       double shopLongitude = Double.parseDouble(shop.getLongitude());
+	         
+	       double theta = longitude - shopLongitude;
+	       double dist = Math.sin(deg2rad(latitude)) * Math.sin(deg2rad(shopLatitude)) + Math.cos(deg2rad(latitude)) * Math.cos(deg2rad(shopLatitude)) * Math.cos(deg2rad(theta));
+	            
+	       dist = Math.acos(dist);
+	       dist = rad2deg(dist);
+	       dist = dist * 60 * 1.1515;
+	            
+	       if (unit == "km") {
+	           dist = dist * 1.609344;
+	       } else if(unit == "m"){
+	           dist = dist * 1609.344;
+	       }
+	           
+	       if(dist <= distance) {
+	          filteredShops.add(shop);
+	       }
+	    }
+	      
+	    return filteredShops;
+	 }
+	   
+    /*
+     * decimal degrees -> radian
+     * radian -> decimal degrees
+     * 변환
+     */
+     private static double deg2rad(double deg) {
+         return (deg * Math.PI / 180.0);
+     }
+     
+     private static double rad2deg(double rad) {
+         return (rad * 180 / Math.PI);
+     }
+
+     
+     /*
+      * 가격 필터가 적용된 가게 조회
+      */
+     public List<Shop> runPriceFilter(int price){
+    	 List<Shop> filteredShops = shopRepository.runPriceFilter(price);
+    	 return filteredShops;
+     }
 }

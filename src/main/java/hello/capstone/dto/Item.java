@@ -1,13 +1,11 @@
 package hello.capstone.dto;
 
-import java.sql.Date;
-
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
 @AllArgsConstructor
 public class Item {
 
@@ -16,10 +14,11 @@ public class Item {
 	private int cost;
 	private int salecost;
 	private int quantity;
+	private String itemnotice;
 	private String image;
 	private String category;
-	private Date starttime;
-	private Date endtime;
+	private Timestamp  starttime;
+	private Timestamp  endtime;
 	
 	public Item() {}
 	

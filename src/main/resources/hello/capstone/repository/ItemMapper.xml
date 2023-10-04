@@ -4,11 +4,23 @@
 <mapper namespace="hello.capstone.repository.ItemMapper">
 
 	<insert id="saveitem">
-		insert into item(shopidx, itemname, cost, salecost, quantity, image, category, starttime, endtime) values(#{shopidx},#{itemname},#{cost},#{salecost},#{quantity},#{image},#{category}, #{starttime}, #{endtime});
+		insert into item(shopidx, itemname, itemnotice, cost, salecost, quantity, image, category, starttime, endtime) values(#{shopidx},#{itemname}, #{itemnotice}, #{cost},#{salecost},#{quantity},#{image},#{category}, #{starttime}, #{endtime});
 	</insert>
 
 	<select id="findByShopIdx_itemname" resultType="item">
 		select * from item where shopidx = #{shopidx} and itemname = #{itemname};
 	</select>
 
+	<select id = "getItems" resultType = "hashmap">
+		select * 
+		from item 
+		where shopidx = #{shopidx};
+	</select>
+	
+	<delete id="deleteItemEndtime" >
+       DELETE FROM item
+       WHERE endtime &lt;= #{time};
+   	</delete>
+	
+	
 </mapper>
