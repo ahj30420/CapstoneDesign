@@ -36,7 +36,7 @@
 	
 	<select id = "runPriceFilter" resultType = "Shop">
 		select * from shop where shopidx in (
-			select distinct shopidx from item where salecost &lt;#{price}
+			select distinct shopidx from item where salecost &lt;=#{price}
 		);
 	</select>
 </mapper>

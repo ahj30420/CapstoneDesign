@@ -2,6 +2,7 @@ package hello.capstone.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,8 +82,9 @@ public class ShopController {
 	 * 지도 shop marker 표시 테스트용 (모든 shop)
 	 */
 	@GetMapping("/ShopMarker")
-	public List<Shop> ShopAdress(){
+	public List<Shop> ShopAdress(HttpSession session){
 		List<Shop> shops = shopService.getShops();
+		
 		return shops;
 	} 
 	
@@ -115,35 +117,42 @@ public class ShopController {
 		}
 	}
 	
-	@GetMapping("/getShop/filter")
-	   public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
-	                                 @RequestParam("longitude") String myLongitude,
-	                                 @RequestParam("distance") String distance,
-	                                 @RequestParam("unit") String unit,
-	                                 @RequestParam(value = "price", defaultValue = "0") String price,
-	                                 @RequestParam(value = "endtime", defaultValue = "0") String endtime){
-	      
-	      double latitude = Double.parseDouble(myLatitude);
-	      double longitude = Double.parseDouble(myLongitude);
-	      
-	      double dist = Double.parseDouble(distance);
-	      
-	      List<Shop> distanceFilteredShops = shopService.runDistanceFilter(latitude, longitude, dist, unit);
-	      log.info("distanceFilteredShops", distanceFilteredShops);
-	      
-	      return distanceFilteredShops;
-	}
-	
 	/*
-	 * price filter 테스트용
-	 */
-	@GetMapping("/getShop/filter/price")
-	   public List<Shop> getShopFilterPrice(@RequestParam(value = "price", defaultValue = "0") int price){
-	  
-	      List<Shop> priceFilteredShops = shopService.runPriceFilter(price);
-	      log.info("priceFilteredShops = {} ", priceFilteredShops);
-	      
-	      return priceFilteredShops;
-	}
-	
+     * 필터 적용 가게 조회
+     */
+    @GetMapping("/getShop/filter")
+    public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
+                                  @RequestParam("longitude") String myLongitude,
+                                  @RequestParam(value = "distance", defaultValue = "0") String distance,
+                                  @RequestParam(value = "unit", defaultValue = "m") String unit,
+                                  @RequestParam(value = "price", defaultValue = "0") String itemprice){
+      
+
+       List<Shop> allShops = shopService.getShops();
+      
+       log.info("allShops = {}", allShops);
+       double latitude = Double.parseDouble(myLatitude);
+       double longitude = Double.parseDouble(myLongitude);
+       double dist = Double.parseDouble(distance);
+       int price = Integer.parseInt(itemprice);
+       
+       if(dist != 0) {
+          List<Shop> distanceFilteredShops = shopService.runDistanceFilter(latitude, longitude, dist, unit);
+          if(distanceFilteredShops != null) {   
+             allShops.retainAll(distanceFilteredShops);
+             log.info("distanceFilteredShops = {}", distanceFilteredShops);   
+          }
+       }   
+       if(price != 0) {
+          List<Shop> priceFilteredShops = shopService.runPriceFilter(price);
+          if(priceFilteredShops != null) {   
+             allShops.retainAll(priceFilteredShops);
+             log.info("priceFilteredShops= {}", priceFilteredShops);   
+          }
+       }
+       
+      
+       return allShops;
+    }
+
 }

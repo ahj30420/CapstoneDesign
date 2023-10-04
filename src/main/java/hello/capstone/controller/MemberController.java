@@ -103,26 +103,31 @@ public class MemberController {
 	 * 회원 탈퇴
 	 */
 	@DeleteMapping("/delete")
-	public String deleteMember(HttpSession session) {
-
+	public String deleteMember(HttpSession session, String pw) {
+		
 		Member member = (Member) session.getAttribute("member");
+		memberService.pwCheck(member, pw);
 		memberService.deleteMember(member);
 		
 		session.removeAttribute("member");
 		
 		return "login";
 	}
-	
+
 	/*
-	 * 비밀번호 일치 확인
+	 * 비밀번호 수정
 	 */
-	@GetMapping("/info/pwcheck")
-	public void passwordCheck(HttpSession session, @RequestParam("pw") String pw) {
+	@PutMapping("/update/pw")
+	public String updatePw(@RequestBody HashMap<String,String> pwMap, HttpSession session) {
+		String oldPw = pwMap.get("oldpw");
+		String newPw = pwMap.get("newpw");
+		Member member = (Member)session.getAttribute("member");
+		memberService.pwCheck(member, oldPw);
 		
-		String realPw = ((Member)session.getAttribute("member")).getPw();
-		if(!(realPw.equals(pw))) {
-	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
-	      }
-	
+		Member newMember = memberService.updatePwOnPurpose(member, newPw);
+		session.setAttribute("member", newMember);
+		
+		return "/";
 	}
+	
 }

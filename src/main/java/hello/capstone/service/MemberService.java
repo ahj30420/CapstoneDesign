@@ -1,20 +1,24 @@
 package hello.capstone.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.FindPwException;
+//import hello.capstone.exception.FindPwException;
+import hello.capstone.exception.LogInException;
 import hello.capstone.exception.NicknameException;
 import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.repository.MemberRepository;
 import hello.capstone.repository.ShopRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +29,9 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final ShopRepository shopRepository;
 	
+	/*
+	 * 멤버의 멤버인덱스 조회
+	 */
 	public int getMeberIdx(Member member) {
 		int idx = memberRepository.getMeberIdx(member);
 		return idx;
@@ -55,12 +62,16 @@ public class MemberService {
 		return memberRepository.getMyBookmarkedShop(memberIdx);
 	}
 	
-	
 	/*
 	 * 닉네임 변경
 	 */
 	@Transactional
+	
 	public Member updateNickname(Member member, String nickname) {
+		//닉네임이 원래 닉네임과 같거나 15글자 이상은 수정x
+		if(member.getNickname().equals(nickname) || nickname.length() > 15) {
+			throw new NicknameException(ErrorCode.NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS, null);
+		}
 		memberRepository.updateNickname(member, nickname);
 		member.setNickname(nickname);
 		
@@ -89,7 +100,7 @@ public class MemberService {
 		
 		memberRepository.updateMember(oldMember, newMember);
 		oldMember.setNickname(newMember.getNickname());
-		oldMember.setPw(newMember.getPw());
+		oldMember.setName(newMember.getName());
 		oldMember.setPhone(newMember.getPhone());
 		
 		return oldMember;
@@ -119,9 +130,42 @@ public class MemberService {
 		}
 		return member;
 	}
-	
+	/*
+	 * 비밀번호 변경 (비밀번호 찾기에서)
+	 */
+	@Transactional
 	public void updatepw(String id, String pw) {
 		memberRepository.updatepw(id, pw, "normal");
 	}
+	
+	
+	/*
+	 * 비밀번호 일치 확인
+	 */
+	
+	public void pwCheck(Member member, String oldPw) {
+
+		if(!(member.getPw().equals(oldPw))) {
+	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
+	      }
+	
+	}
+	
+
+	/*
+	 * 비민번호 변경 (사용자가 의도적으로 비밀번호 변경을 원할 때)
+	 */
+	@Transactional
+	public Member updatePwOnPurpose(Member member, String newPw) {
+		
+		member.setPw(newPw);
+		memberRepository.updatepw(member.getId(), member.getPw(), "normal");
+		
+		
+		return member;
+	}
+	
+	//---------------------------------------------------------------------------------------------
+	
 	
 }

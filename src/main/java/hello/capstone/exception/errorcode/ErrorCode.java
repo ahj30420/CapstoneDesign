@@ -18,7 +18,10 @@ public enum ErrorCode {
 	ALREADY_BOOKMARKED_SHOP(HttpStatus.CONFLICT, "이미 즐겨찾기를 한 가게 입니다."),
 	NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS(HttpStatus.CONFLICT, "기존 닉네임과 다른 15글자 이내에 닉네임을 입력하세요."),
 	DUPLICATED_ITEM(HttpStatus.CONFLICT, "이미 등록된 상품입니다."),
-	TIME_SETTING_ERROR(HttpStatus.CONFLICT, "이벤트 종료시간이 현재시간보다 이릅니다.");
+	TIME_SETTING_ERROR(HttpStatus.CONFLICT, "이벤트 종료시간이 현재시간보다 이릅니다."),
+	INVALID_PHONE_NUMBER(HttpStatus.CONFLICT, "휴대폰 번호는 '-'을 제회한 11자이어야 합니다."),
+	INVALID_EMAIL_ID(HttpStatus.CONFLICT, "올바르지 않은 이메일형식의 아이디입니다.");
+	
 	
 	private HttpStatus status;
 	private String message;

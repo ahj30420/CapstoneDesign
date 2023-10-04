@@ -24,8 +24,6 @@ public interface ShopMapper {
    List<Shop> getShops();
    
    List<Shop> getShopByMember(@Param("memberidx") int memberidx);
-
-   boolean modifyshop();
    
    List<Shop> runPriceFilter(int price);
 }

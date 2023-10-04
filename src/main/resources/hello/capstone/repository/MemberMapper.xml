@@ -26,7 +26,7 @@
 		update member
 
 		set nickname = #{newMember.nickname},
-			pw = #{newMember.pw},
+			name = #{newMember.name},
 			phone = #{newMember.phone}
 		
 		where id = #{oldMember.id} and pw = #{oldMember.pw};

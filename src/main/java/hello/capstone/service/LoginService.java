@@ -18,6 +18,8 @@ import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import hello.capstone.dto.Member;
+import hello.capstone.exception.InvalidEmailException;
+import hello.capstone.exception.InvalidPhoneNumberException;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.errorcode.ErrorCode;
@@ -34,14 +36,26 @@ public class LoginService {
 	/*
 	 * 회원가입 - 마지막 수정 09/20/ 23시 20분
 	 * */
-	public boolean signUp(Member member) {
+public boolean signUp(Member member) {
 		
-		
+		//중복ID 검사
 		//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
 		Optional.ofNullable(memberRepository.findById(member.getId(),"normal"))
 			.ifPresent(user->{
 				throw new SignUpException(ErrorCode.DUPLICATED_USER_ID,null);
 			});
+		
+		//휴대폰 번호 유효성 검사
+		if(member.getPhone().length() != 11 || member.getPhone().contains("-") ) {
+			throw new InvalidPhoneNumberException(ErrorCode.INVALID_PHONE_NUMBER,null);
+		}
+		
+		//이메일 형식 아이디 유효성 검사 직접입력시, .com포함하는가 (@는 확실)
+		int lastFour = member.getId().length() - 4;
+		if(!(member.getId().substring(lastFour).equals(".com"))){
+			
+			throw new InvalidEmailException(ErrorCode.INVALID_EMAIL_ID,null);
+		}
 		
 		long miliseconds = System.currentTimeMillis();
 		Date redate = new Date(miliseconds);
