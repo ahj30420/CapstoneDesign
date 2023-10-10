@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.capstone.repository.RatingsMapper">
+
+	<select id="existingRatings" resultType="Ratings">
+		select * from ratings
+		where shopidx = #{shopidx} and memberidx = #{memberidx};
+	</select>
+
+	<update id="updateRatings">
+		update ratings set rating = #{rating} 
+		where shopidx = #{shopidx} and memberidx = #{memberidx};
+	</update>
+
+	<insert id="setRatings">
+		insert into ratings(shopidx, memberidx, rating)
+		values(#{shopidx}, #{memberidx}, #{rating});
+	</insert>
+	
+	<select id="getSumCount" resultType="hashmap">
+		select sum(rating) as sum, count(*) as count 
+		from ratings
+		where shopidx = #{shopidx};
+	</select>
+
+</mapper>

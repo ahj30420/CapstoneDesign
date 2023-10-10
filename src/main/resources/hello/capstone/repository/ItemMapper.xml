@@ -11,7 +11,7 @@
 		select * from item where shopidx = #{shopidx} and itemname = #{itemname};
 	</select>
 
-	<select id = "getItems" resultType = "hashmap">
+	<select id = "getItems" resultType = "Item">
 		select * 
 		from item 
 		where shopidx = #{shopidx};

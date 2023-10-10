@@ -68,4 +68,18 @@ public class ShopRepository {
 	public List<Shop> runPriceFilter(int price){
 		return shopMapper.runPriceFilter(price);
 	}
+	
+	/*
+	 * 별점 필터에 해당되는 가게 조회
+	 */
+	public List<Shop> runRatingFilter(double rating){
+		return shopMapper.runRatingFilter(rating);
+	}
+	
+	/*
+	 * 가게 별점 설정하기
+	 */
+	public void setRatings(int shopidx, double rating) {
+		shopMapper.setRatings(shopidx, rating);
+	}
 }

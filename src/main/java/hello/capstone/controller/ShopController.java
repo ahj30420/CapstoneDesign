@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import hello.capstone.dto.Member;
+import hello.capstone.dto.Ratings;
 import hello.capstone.dto.Shop;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.errorcode.ErrorCode;
@@ -36,17 +38,20 @@ public class ShopController {
 	@Value("${file.dir}")
 	private String fileDir;
 	
+	
 	@PostMapping("/shopRegistration")
 	public String shopRegistration(@RequestParam(value = "imageFilename", required = false) MultipartFile Image,
-								   @RequestParam(value = "shopidx", required = false) String sidx,
+								   @RequestParam(value = "shopidx", defaultValue = "0") String sidx,
 			  					   @RequestParam("shopName") String shopName,
 			  					   @RequestParam("shopTel") String shopTel,
-			  					   @RequestParam("shopAddress") String shopAddress,
+			  					   @RequestParam(value = "shopAddress", required = false) String shopAddress,
 			  					   @RequestParam("promotionText") String promotionText,
 			  					   @RequestParam("shopWebsite") String shopWebsite,
+			  					   @RequestParam(value = "existingAddress", required = false) String existingAddress,
 			  					   @RequestParam(value = "existingImage", required = false) String existingImage,
 			  					   @RequestParam(value = "method", defaultValue = "register") String method,
 			  					   HttpSession session) throws IllegalStateException, IOException {
+		
 		
 		Member ownerMember = (Member)session.getAttribute("member");
 		int memberidx = memberService.getMeberIdx(ownerMember);
@@ -55,13 +60,14 @@ public class ShopController {
 		shop.setShopName(shopName);
 		shop.setShopTel(shopTel);
 		shop.setPromotionText(promotionText);
-		shop.setShopAddress(shopAddress);
 		shop.setShopWebsite(shopWebsite);
 		shop.setOwnerIdx(memberidx);
 		
-		if(!Image.isEmpty()) {
+		if(Image != null) {
 			String fullPath = fileDir + Image.getOriginalFilename();
 			log.info("파일 저장 fullPath ={}",fullPath);
+			int shopidx = Integer.parseInt(sidx);
+			shop.setShopidx(shopidx);
 			Image.transferTo(new File(fullPath));
 			shop.setImageFilename(Image.getOriginalFilename());
 		}
@@ -70,6 +76,16 @@ public class ShopController {
 			shop.setShopidx(shopidx);
 			shop.setImageFilename(existingImage);
 		}
+		
+		if(shopAddress.equals("")) {
+			log.info("existingAddress = {}", existingAddress);
+			shop.setShopAddress(existingAddress);
+		}
+		else {
+			shop.setShopAddress(shopAddress);
+		}
+		
+		
 		log.info("가게 파라미터={}",shop);
 		log.info("파일 파라미터={}",Image);
 		
@@ -125,7 +141,9 @@ public class ShopController {
                                   @RequestParam("longitude") String myLongitude,
                                   @RequestParam(value = "distance", defaultValue = "0") String distance,
                                   @RequestParam(value = "unit", defaultValue = "m") String unit,
-                                  @RequestParam(value = "price", defaultValue = "0") String itemprice){
+                                  @RequestParam(value = "price", defaultValue = "0") String itemprice,
+                                  @RequestParam(value = "time", defaultValue = "0") String time,
+                                  @RequestParam(value = "rating", defaultValue = "0") String shoprating){
       
 
        List<Shop> allShops = shopService.getShops();
@@ -135,6 +153,9 @@ public class ShopController {
        double longitude = Double.parseDouble(myLongitude);
        double dist = Double.parseDouble(distance);
        int price = Integer.parseInt(itemprice);
+       double rating = Double.parseDouble(shoprating);
+       long minute = Long.parseLong(time);
+
        
        if(dist != 0) {
           List<Shop> distanceFilteredShops = shopService.runDistanceFilter(latitude, longitude, dist, unit);
@@ -150,9 +171,31 @@ public class ShopController {
              log.info("priceFilteredShops= {}", priceFilteredShops);   
           }
        }
-       
+       if(minute != 0) {
+           List<Shop> deadlineFilteredShops = shopService.runDeadlineFilter(minute);   
+           if(deadlineFilteredShops != null) {   
+              allShops.retainAll(deadlineFilteredShops);
+              log.info("deadlineFilteredShops= {}", deadlineFilteredShops);   
+           }
+        }       
+       if(rating != 0) {
+    	   List<Shop> ratingFilteredShops = shopService.runRatingFilter(rating);
+    	   if(ratingFilteredShops != null) {
+    		   allShops.retainAll(ratingFilteredShops);
+    		   log.info("ratingFilteredShops = {}", ratingFilteredShops);
+    	   }
+       }
       
        return allShops;
     }
-
+    
+    /*
+     * 별점 추가
+     */
+    @PostMapping("/setRating")
+    public String setRating(@RequestBody Ratings ratings) {
+    	
+    	shopService.setRating(ratings);
+    	return "";
+    } 
 }

@@ -39,4 +39,13 @@
 			select distinct shopidx from item where salecost &lt;=#{price}
 		);
 	</select>
+	
+	<select id = "runRatingFilter" resultType = "Shop">
+		select * from shop where #{rating} &lt;= rating
+	</select>
+	
+	<update id = "setRatings">
+		update shop set rating = #{rating}
+		where shopidx = #{shopidx};
+	</update>
 </mapper>

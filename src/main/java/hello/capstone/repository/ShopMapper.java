@@ -26,4 +26,8 @@ public interface ShopMapper {
    List<Shop> getShopByMember(@Param("memberidx") int memberidx);
    
    List<Shop> runPriceFilter(int price);
+   
+   List<Shop> runRatingFilter(double rating);
+   
+   void setRatings(@Param("shopidx") int shopidx, @Param("rating") double rating);
 }

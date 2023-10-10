@@ -114,6 +114,15 @@ public class ItemController {
        Date parsedDate = dateFormat.parse(dateString);
        return new Timestamp(parsedDate.getTime());
    }
+   
+//   /*
+//    * 상품 예약
+//    */
+//   @PostMapping("/reservation")
+//   public String reservation(@RequestParam String count, @RequestParam String memberidx, @RequestParam String itemidx) {
+//	   
+//   }
+   
 }
 
 
