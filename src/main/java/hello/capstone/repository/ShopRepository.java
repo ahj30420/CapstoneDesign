@@ -37,15 +37,20 @@ public class ShopRepository {
 		}
 		log.info("repository shop = {}", shop);
 		return true;
-	}	
+	}
 	
 	/*
 	 * shop 인덱스조회
 	 */
 	public int getShopIdx(Shop shop) {
-		   int idx = shopMapper.getShopIdx(shop);
-	  
-		   return idx;
+	   int idx = shopMapper.getShopIdx(shop);
+  
+	   return idx;
+	}
+	
+	public Shop getShopByIdx(int shopidx) {
+		return shopMapper.getShopByIdx(shopidx);
+		
 	}
 	
 	/*
@@ -55,13 +60,13 @@ public class ShopRepository {
 		return shopMapper.getShops();
 	}
 	
+	
 	/*
 	 * 상업자 본인이 올린 가게
 	 */
 	public List<Shop> getShopByMember(int memberidx){
 		return shopMapper.getShopByMember(memberidx);
 	}
-	
 	/*
 	 * 가격 필터에 해당되는 가게 조회
 	 */

@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberRepository {
 
-   public final LoginMapper loginMapper;
-   public final MemberMapper memberMapper;
+   private final LoginMapper loginMapper;
+   private final MemberMapper memberMapper;
    /*
     * 회원정보저장 마지막수정 09/18 23시 20분
     */
@@ -55,15 +55,6 @@ public class MemberRepository {
   
 	   return idx;
    }
-  
-   /*
-    *  이름으로 회원 검색
-    */
-   public Member findByName_Phone(String name, String phone, String social) {
-	   Member findMember = loginMapper.findbyname_phone(name, phone, social);
-	   
-	   return findMember; 
-   }
    
    /*
     * 즐겨찾기한 가게찾기
@@ -79,6 +70,14 @@ public class MemberRepository {
 	   
 	   memberMapper.bookmarkRegistraion(memberIdx, shopIdx);
    }
+   
+   /*
+    * 즐겨찾기 취소
+    */
+   public void bookmarkDelete(int memberIdx, int shopIdx) {
+	   
+	   memberMapper.bookmarkDelete(memberIdx, shopIdx);
+   }
   
    /*
     * 닉네임 변경
@@ -87,6 +86,7 @@ public class MemberRepository {
 	   log.info("member, nickname = {} {} ", member, nickname);
 	   memberMapper.updateNickname(member, nickname);
    }
+   
    
    /*
     * 회원 탈퇴
@@ -102,10 +102,21 @@ public class MemberRepository {
 	public void updateMember(Member oldMember, Member newMember) {
 		memberMapper.updateMember(oldMember, newMember);
 	}
-   
-   
-   public void updatepw(String id, String pw, String social) {
-	   loginMapper.updatepw(id, pw, social);
+	
+   /*
+    * 비밀번호 업데이트
+    */
+	public void updatepw(String id, String pw, String social) {
+		   loginMapper.updatepw(id, pw, social);
+	}
+	 /*
+    *  이름으로 회원 검색
+    */
+   public Member findByName_Phone(String name, String phone, String social) {
+	   Member findMember = loginMapper.findbyname_phone(name, phone, social);
+	   
+	   return findMember; 
    }
+   
    
 }

@@ -15,8 +15,6 @@ public interface ShopMapper {
    Shop findByAddress(@Param("address") String address);  
    
    void saveShop(Shop shop);
-   
-   void modifyShop(Shop shop);
   
    int getShopIdx(Shop shop);
    
@@ -26,6 +24,10 @@ public interface ShopMapper {
    List<Shop> getShopByMember(@Param("memberidx") int memberidx);
    
    List<Shop> runPriceFilter(int price);
+   
+   void modifyShop(Shop shop);
+
+   Shop getShopByIdx(@Param("shopidx") int shopidx);
    
    List<Shop> runRatingFilter(double rating);
    

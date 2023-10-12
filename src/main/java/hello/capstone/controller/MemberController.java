@@ -1,12 +1,12 @@
 package hello.capstone.controller;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
+import hello.capstone.dto.Alarm;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.errorcode.ErrorCode;
+import hello.capstone.service.ItemService;
 import hello.capstone.service.MemberService;
 import hello.capstone.service.ShopService;
 import jakarta.servlet.http.HttpSession;
@@ -32,6 +34,7 @@ public class MemberController {
 	
 	private final MemberService memberService;
 	private final ShopService shopService;
+	private final ItemService itemService;
 	
 	
 	/*
@@ -53,7 +56,26 @@ public class MemberController {
 	}
 	
 	/*
-	 * 즐겨찾기 조회
+	 * 즐겨찾기 취소
+	 */
+	@DeleteMapping("/bookmark/delete")
+	public String bookmarkDelete(HttpSession session, @RequestBody Shop shop) {
+		Member member = (Member) session.getAttribute("member");
+		
+		log.info("member = {} ", member);
+		
+		int memberIdx = memberService.getMeberIdx(member);
+		int shopIdx = shopService.getShopIdx(shop);
+		
+		memberService.bookmarkDelete(memberIdx, shopIdx);
+		
+
+		return "/home_user";
+	}
+	
+	
+	/*
+	 * 즐겨찾기 목록 조회
 	 */
 	@GetMapping("/bookmark/check")
 	public List<Shop> bookmarkCheck(HttpSession session) {
@@ -74,7 +96,7 @@ public class MemberController {
 	 */
 	@PutMapping("/update/nickname")
 	public String updateNickname(@RequestBody HashMap<String,String> nick, HttpSession session) {
-		log.info("닉네임 ={} ", nick.get("nickname"));
+		
 		String nickname = nick.get("nickname");
 		Member member = (Member) session.getAttribute("member");
 		
@@ -86,11 +108,38 @@ public class MemberController {
 	}
 	
 	/*
+	 * 비밀번호 수정
+	 */
+	@PutMapping("/update/pw")
+	public String updatePw(@RequestBody HashMap<String,String> pwMap, HttpSession session) {
+		log.info("pwMap = {}", pwMap);
+		String oldPw = pwMap.get("oldpw");
+		String newPw = pwMap.get("newpw");
+		Member member = (Member)session.getAttribute("member");
+		memberService.pwCheck(member, oldPw);
+		
+		Member newMember = memberService.updatePwOnPurpose(member, newPw);
+		session.setAttribute("member", newMember);
+		
+		return "/";
+	}
+	
+	/*
 	 * 회원정보 수정
 	 */
 	@PutMapping("/update/info")
-	public String updateInfo(@RequestBody Member newMember, HttpSession session) {
+	public String updateInfo(@RequestBody HashMap<String, String> newMemberMap, HttpSession session) {
+		log.info("newMemberMap = {}", newMemberMap);
 		Member oldMember = (Member) session.getAttribute("member");
+		String newName = newMemberMap.get("newname");
+		String newNickname = newMemberMap.get("newnickname");
+		String newPhone = newMemberMap.get("newphone");
+		
+		Member newMember = new Member();
+		newMember.setName(newName);
+		newMember.setNickname(newNickname);
+		newMember.setPhone(newPhone);
+		
 		newMember = memberService.updateMember(oldMember, newMember);
 		
 		session.setAttribute("member", newMember);
@@ -113,21 +162,29 @@ public class MemberController {
 		
 		return "login";
 	}
-
+	
 	/*
-	 * 비밀번호 수정
+	 * 알람 가져오기
 	 */
-	@PutMapping("/update/pw")
-	public String updatePw(@RequestBody HashMap<String,String> pwMap, HttpSession session) {
-		String oldPw = pwMap.get("oldpw");
-		String newPw = pwMap.get("newpw");
-		Member member = (Member)session.getAttribute("member");
-		memberService.pwCheck(member, oldPw);
+	@GetMapping("/getAlarm")
+	public List<Shop> getAlarm(HttpSession session){
+		Member member = (Member) session.getAttribute("member");
+		List<Shop> alarmShop = new ArrayList<Shop>();
 		
-		Member newMember = memberService.updatePwOnPurpose(member, newPw);
-		session.setAttribute("member", newMember);
+		List<Alarm> shopIdxes = itemService.getAlarm(memberService.getMeberIdx(member));
+		for (Alarm idx : shopIdxes) {
+			alarmShop.add(shopService.getShopByIdx(idx.getShopIdx()));
+		}
 		
-		return "/";
+		return alarmShop;
+	}
+	
+	/*
+	 * 읽은 알람 삭제
+	 */
+	@DeleteMapping("deleteReadAlarm")
+	public void deleteReadAlarm(@RequestBody Shop shop, HttpSession session) {
+		itemService.deleteReadAlarm(shop, (Member)session.getAttribute("member"));
 	}
 	
 }

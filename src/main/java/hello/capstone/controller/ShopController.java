@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +36,6 @@ public class ShopController {
 	
 	@Value("${file.dir}")
 	private String fileDir;
-	
 	
 	@PostMapping("/shopRegistration")
 	public String shopRegistration(@RequestParam(value = "imageFilename", required = false) MultipartFile Image,
@@ -95,29 +93,6 @@ public class ShopController {
 	}
 	
 	/*
-	 * 지도 shop marker 표시 테스트용 (모든 shop)
-	 */
-	@GetMapping("/ShopMarker")
-	public List<Shop> ShopAdress(HttpSession session){
-		List<Shop> shops = shopService.getShops();
-		
-		return shops;
-	} 
-	
-	/*
-	 * 본인의 가게 정보 가져오기 (상업자 버전)
-	 */
-	@GetMapping("/getMyShop")
-	public List<Shop> getMyShop(HttpSession session){
-		Member member = (Member) session.getAttribute("member");
-		
-		List<Shop> shops = shopService.getShopByMember(memberService.getMeberIdx(member));
-		
-		log.info("shops = {} ", shops);
-		return shops;
-	}
-	
-	/*
 	 * 본인 인증(pw 확인)
 	 */
 	@PostMapping("/Pw_verification")
@@ -133,10 +108,33 @@ public class ShopController {
 		}
 	}
 	
+	
 	/*
-     * 필터 적용 가게 조회
-     */
-    @GetMapping("/getShop/filter")
+	 * 지도 shop marker 표시 (모든 shop)
+	 */
+	@GetMapping("/ShopMarker")
+	public List<Shop> ShopAddress(HttpSession session){
+		List<Shop> shops = shopService.getShops();
+		
+		return shops;
+	} 
+	
+	/*
+	 * 본인의 가게 정보 가져오기 (상업자 버전)
+	 */
+	@GetMapping("/getMyShop")
+	public List<Shop> getMyShop(HttpSession session){
+		Member member = (Member) session.getAttribute("member");
+		
+		List<Shop> shops = shopService.getShopByMember(memberService.getMeberIdx(member));
+		
+		return shops;
+	}
+	
+	/*
+	 * 필터를 적용한 가게 조회 거리, 가격, 마감시간
+	 */
+	@GetMapping("/getShop/filter")
     public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
                                   @RequestParam("longitude") String myLongitude,
                                   @RequestParam(value = "distance", defaultValue = "0") String distance,
@@ -192,10 +190,31 @@ public class ShopController {
     /*
      * 별점 추가
      */
-    @PostMapping("/setRating")
-    public String setRating(@RequestBody Ratings ratings) {
-    	
-    	shopService.setRating(ratings);
-    	return "";
+//    @PostMapping("/setRating")
+//    public String setRating(@RequestBody Ratings ratings) {
+//    	
+//    	shopService.setRating(ratings);
+//    	return "";
+//    } 
+    
+    /*
+     * 별점 추가
+     */
+    @GetMapping("/setRating")
+    public String setRating(@RequestParam int shopidx,
+                      @RequestParam int memberidx,
+                      @RequestParam int rating) {
+       
+       
+       
+       Ratings ratings = new Ratings(0,shopidx,memberidx,rating);
+       
+       shopService.setRating(ratings);
+       return "";
     } 
+
+	
+	
+	
+
 }

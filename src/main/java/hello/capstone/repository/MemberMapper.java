@@ -14,6 +14,8 @@ public interface MemberMapper {
 
 	void bookmarkRegistraion(@Param("memberidx") int memberidx, @Param("shopidx") int shopidx );
 	
+	void bookmarkDelete(@Param("memberidx") int memberidx, @Param("shopidx") int shopidx);
+	
 	List<Shop> getMyBookmarkedShop(@Param("memberidx") int memberidx);
 	
 	void updateNickname(@Param("member") Member member, @Param("nickname") String nick);
@@ -21,4 +23,6 @@ public interface MemberMapper {
 	void deleteMember(Member member);
 	
 	void updateMember(@Param("oldMember") Member oldMember, @Param("newMember") Member newMember);
+	
+	
 }

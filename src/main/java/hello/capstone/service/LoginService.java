@@ -36,7 +36,7 @@ public class LoginService {
 	/*
 	 * 회원가입 - 마지막 수정 09/20/ 23시 20분
 	 * */
-public boolean signUp(Member member) {
+	public boolean signUp(Member member) {
 		
 		//중복ID 검사
 		//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
@@ -143,11 +143,11 @@ public boolean signUp(Member member) {
 	 */
 	public SingleMessageSentResponse sendMessage(String phone, String code) {
 		
-		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCS2WM9OPHXRSX3S", "HBXEEKMI2NVBRJV4L5HJSFVN31AITSDU", "https://api.coolsms.co.kr");
+		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCSRAEZQIIMYGVDM", "Z8VBFEFGTR9FIY47NF42GEK8UUKCKUKG", "https://api.coolsms.co.kr");
 		
 		Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
-        message.setFrom("01085864484");
+        message.setFrom("01092592260");
         message.setTo(phone);
         message.setText("[재고30]인증번호 " + code + "를 입력하세요.");
 

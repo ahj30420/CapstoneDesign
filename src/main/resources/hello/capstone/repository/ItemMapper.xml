@@ -4,8 +4,14 @@
 <mapper namespace="hello.capstone.repository.ItemMapper">
 
 	<insert id="saveitem">
-		insert into item(shopidx, itemname, itemnotice, cost, salecost, quantity, image, category, starttime, endtime) values(#{shopidx},#{itemname}, #{itemnotice}, #{cost},#{salecost},#{quantity},#{image},#{category}, #{starttime}, #{endtime});
-	</insert>
+      insert into item(shopidx, itemname, itemnotice, cost, salecost, quantity, image, category, starttime, endtime) 
+      values(#{shopidx},#{itemname}, #{itemnotice}, #{cost},#{salecost},#{quantity},#{image},#{category}, #{starttime}, #{endtime});
+   </insert>
+   
+   <update id="modifyItem">
+      update item set shopidx = #{shopidx}, itemname = #{itemname}, itemnotice = #{itemnotice}, cost = #{cost}, salecost = #{salecost}, quantity = #{quantity}, image = #{image}, category = #{category}, starttime = #{starttime}, endtime = #{endtime}
+      where itemidx = #{itemidx}   
+   </update>
 
 	<select id="findByShopIdx_itemname" resultType="item">
 		select * from item where shopidx = #{shopidx} and itemname = #{itemname};
@@ -18,9 +24,76 @@
 	</select>
 	
 	<delete id="deleteItemEndtime" >
-       DELETE FROM item
-       WHERE endtime &lt;= #{time};
-   	</delete>
+	    DELETE FROM item
+	    WHERE endtime &lt;= #{time};
+	</delete>
 	
+
+	<insert id="pushAlarm">
+        insert into alarm (memberidx, shopidx,regisdate)
+		select b.memberidx, b.shopidx,NOW() 
+		from bookmarks b
+		where b.shopidx = #{shopidx};
+   </insert>
+   
+   <delete id="deleteTimeoutAlarm">
+        delete 
+		from alarm
+		where TIMESTAMPDIFF(hour, regisdate, NOW()) >= 24;
+   </delete>
+   
+   <delete id="deleteReadAlarm">
+        delete 
+		from alarm
+		where shopidx = #{shop.shopidx} and memberidx = #{member.memberidx}
+   </delete>
 	
+	<select id = "getAlarm" resultType="Alarm">
+		Select *
+		from alarm
+		where memberidx = #{memberidx};
+	</select>
+	
+	<select id = "getQuantity">
+		select quantity
+		from item
+		where itemidx = #{itemidx};
+	</select>
+	
+	<insert id = "reservation">
+		insert into reservation(memberidx, shopidx, itemidx, number, redate) 
+		values(#{memberidx}, #{shopidx}, #{itemidx}, #{number}, #{redate});
+	</insert>
+	
+	<update id = "reduceQuantity">
+		update item set quantity = quantity - #{number}
+		where itemidx = #{itemidx};
+	</update>
+	
+	<update id = "reservationConfirm">
+		update reservation set confirm = true
+		where reservationidx = #{ridx};
+	</update>
+	
+	<delete id = "reservationDelete">
+		delete from reservation
+		where reservationidx = #{ridx};
+	</delete>
+	
+	<update id = "increaseQuantity">
+		update item set quantity = quantity + #{number}
+		where itemidx = #{itemidx}; 
+	</update>
+	
+	<update id = "checkTrust">
+		update member as m
+		set trust = trust - 1
+		where m.memberidx in
+			(select memberidx from 
+				(select memberidx, confirm 
+	 			 from reservation as r left join item as i 
+     			 on r.itemidx = i.itemidx
+     			 where i.endtime &lt;= #{time}) as c
+			 where c.confirm = false);
+	</update>
 </mapper>

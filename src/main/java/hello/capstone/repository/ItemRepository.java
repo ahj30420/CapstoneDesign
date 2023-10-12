@@ -3,11 +3,17 @@ package hello.capstone.repository;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import hello.capstone.dto.Alarm;
 import hello.capstone.dto.Item;
+import hello.capstone.dto.Member;
+import hello.capstone.dto.Reservation;
+import hello.capstone.dto.Shop;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,8 +27,14 @@ public class ItemRepository {
 	/*
 	 * 상품 등록
 	 */
-	public boolean saveitem(Item item) {
-		itemMapper.saveitem(item);
+	public boolean saveitem(Item item, String method) {
+		if(method.equals("register")) {
+			log.info("repository_item = {}", item);
+			itemMapper.saveitem(item);
+		}
+		else {
+			itemMapper.modifyItem(item);
+		}
 		return true;
 	}
 	
@@ -45,13 +57,84 @@ public class ItemRepository {
 	}
 	
 	/*
-    * 아이템 삭제
-    */
+	 * 아이템 삭제
+	 */
 	public void deleteItemEndtime(Timestamp now) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String time = sdf.format(now);
+        String time = sdf.format(now);
 		itemMapper.deleteItemEndtime(time);
 	}
 	
+
+	/*
+	 * 알림 등록
+	 */
+	public void pushAlarm(int shopidx) {
+		itemMapper.pushAlarm(shopidx);
+	}
 	
+	
+	/*
+	 * 알림 가져오기
+	 */
+	public List<Alarm> getAlarm(int memberidx) {
+		
+		return itemMapper.getAlarm(memberidx);
+		   
+	}
+	
+	/*
+	 * 읽은 알림 삭제
+	 */
+	public void deleteReadAlarm(Shop shop, Member member) {
+		itemMapper.deleteReadAlarm(shop, member);
+		
+	}
+	
+	/*
+	 * 24시간이 지난 알림 삭제
+	 */
+	public void deleteTimeoutAlarm() {
+		itemMapper.deleteTimeoutAlarm();
+		
+	}
+	
+	/*
+	 *  아이템 수량 조회
+	 */
+	public int getQuantityByitemIdx(int itemidx) {
+		return itemMapper.getQuantity(itemidx);
+	}
+	
+	/*
+	 * 상품 예약
+	 */
+	public void reservation(Reservation reservation) {
+		itemMapper.reservation(reservation);
+		itemMapper.reduceQuantity(reservation);
+	}
+	
+	/*
+	 * 상품 예약 확인(상업자가 확인 버튼 클릭)
+	 */
+	public void reservationConfirm(int ridx) {
+		itemMapper.reservationConfirm(ridx);
+	}
+	
+	/*
+	 * 상품 예약 취소
+	 */
+	public void reservationCancel(int ridx, int itemidx, int number) {
+		itemMapper.reservationDelete(ridx);
+		itemMapper.increaseQuantity(itemidx, number);
+	}
+	
+	/*
+	 * 예약자 실제 상품 결제 확인하여 신뢰점수 차감
+	 */
+	public void checkTrust(Timestamp now) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = sdf.format(now);
+		itemMapper.checkTrust(time);
+	}
 }

@@ -11,6 +11,7 @@ import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.FindPwException;
+import hello.capstone.exception.InvalidPhoneNumberException;
 //import hello.capstone.exception.FindPwException;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.NicknameException;
@@ -54,6 +55,14 @@ public class MemberService {
 	}
 	
 	/*
+	 * 즐겨찾기 취소
+	 */
+	@Transactional
+	public void bookmarkDelete(int memberIdx, int shopIdx) {
+		memberRepository.bookmarkDelete(memberIdx, shopIdx);
+	}
+	
+	/*
 	 * 즐겨찾기한 가게들의 인덱스 조회 
 	 */
 	public List<Shop> getMyBookmarkedShop(int memberIdx) {
@@ -68,9 +77,9 @@ public class MemberService {
 	@Transactional
 	
 	public Member updateNickname(Member member, String nickname) {
-		//닉네임이 원래 닉네임과 같거나 15글자 이상은 수정x
-		if(member.getNickname().equals(nickname) || nickname.length() > 15) {
-			throw new NicknameException(ErrorCode.NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS, null);
+		//닉네임이 15글자 이상은 수정x
+		if( nickname.length() > 15) {
+			throw new NicknameException(ErrorCode.NICKNAME_MORE_TAHN_15LETTERS, null);
 		}
 		memberRepository.updateNickname(member, nickname);
 		member.setNickname(nickname);
@@ -93,11 +102,14 @@ public class MemberService {
 	@Transactional
 	public Member updateMember(Member oldMember, Member newMember) {
 		
-		if(oldMember.getNickname().equals(newMember.getNickname()) || 
-				newMember.getNickname().length() > 15) {
-			throw new NicknameException(ErrorCode.NICKNAME_DUPLICATED_OR_MORE_TAHN_15LETTERS, null);
+		if(newMember.getNickname().length() > 15) {
+			throw new NicknameException(ErrorCode.NICKNAME_MORE_TAHN_15LETTERS, null);
 		}
 		
+		//휴대폰 번호 유효성 검사
+		if(newMember.getPhone().length() != 11 || newMember.getPhone().contains("-") ) {
+			throw new InvalidPhoneNumberException(ErrorCode.INVALID_PHONE_NUMBER,null);
+		}
 		memberRepository.updateMember(oldMember, newMember);
 		oldMember.setNickname(newMember.getNickname());
 		oldMember.setName(newMember.getName());

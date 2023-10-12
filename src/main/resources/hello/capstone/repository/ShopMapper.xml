@@ -12,21 +12,19 @@
       insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate, longitude, latitude) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, #{registrationDate}, #{longitude}, #{latitude});
 	</insert>
 	
-	<update id="modifyShop">
-		update shop set shopname = #{shopName}, shopaddress = #{shopAddress}, owneridx = #{ownerIdx}, shoptel = #{shopTel}, shopwebsite = #{shopWebsite}, imagefilename = #{imageFilename}, promotionText = #{promotionText}, longitude = #{longitude}, latitude = #{latitude}
-		where shopidx = #{shopidx}
-		 
-	</update>
-	
 	<select id="getShopIdx">
 		select shopidx from shop where shopname = #{shopName} and shopaddress = #{shopAddress};
 	</select>
 	
+	<select id="getShopByIdx">
+		select * from shop where shopidx = #{shopidx};
+	</select>
+	
 	<select id = "getShops" resultType = "Shop">
-      select distinct s.*
-      from shop s
-      inner join item i ON s.shopidx = i.shopidx;
-   </select>
+		select distinct s.*
+		from shop s
+		inner join item i ON s.shopidx = i.shopidx;
+	</select>
 	
 	<select id = "getShopByMember" resultType = "hashmap">
 		select * 
@@ -34,9 +32,15 @@
 		where owneridx = #{memberidx};
 	</select>
 	
+	<update id="modifyShop">
+		update shop set shopname = #{shopName}, shopaddress = #{shopAddress}, owneridx = #{ownerIdx}, shoptel = #{shopTel}, shopwebsite = #{shopWebsite}, imagefilename = #{imageFilename}, promotionText = #{promotionText}, longitude = #{longitude}, latitude = #{latitude}
+		where shopidx = #{shopidx}
+		 
+	</update>
+	
 	<select id = "runPriceFilter" resultType = "Shop">
 		select * from shop where shopidx in (
-			select distinct shopidx from item where salecost &lt;=#{price}
+			select distinct shopidx from item where salecost &lt;= #{price}
 		);
 	</select>
 	

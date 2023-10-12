@@ -7,6 +7,14 @@
 		insert into bookmarks(memberidx, shopidx) values( #{memberidx}, #{shopidx} );
 	</insert>
 	
+	
+	<delete id="bookmarkDelete">
+		delete 
+		from bookmarks
+		where memberidx = #{memberidx} and shopidx = #{shopidx};
+	</delete>
+	
+	
 	<select id ="getMyBookmarkedShop" resultType ="hashmap">
 		SELECT s.*
 		FROM bookmarks b
@@ -21,7 +29,7 @@
 		
 		where id = #{member.id,jdbcType=VARCHAR} and pw = #{member.pw,jdbcType=VARCHAR};
 	</update>
-
+	
 	<update id = "updateMember">
 		update member
 
@@ -37,5 +45,7 @@
 
 		where id = #{id} and pw = #{pw};
 	</delete>
-
+	
+	
+	
 </mapper>

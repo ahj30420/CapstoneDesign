@@ -9,6 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Item {
 
+	private int itemidx;
 	private int shopidx;
 	private String itemname;
 	private int cost;

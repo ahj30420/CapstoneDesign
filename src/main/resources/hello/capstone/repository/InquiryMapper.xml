@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.capstone.repository.InquiryMapper">
+
+	<insert id = "register">
+		insert into inquiry(useridx, redate, content_inquiry)
+		values(#{useridx}, #{redate}, #{content_inquiry});
+	</insert>
+	
+	<delete id = "delete">
+		delete from inquiry
+		where inquiryidx = #{inquiryidx};
+	</delete>
+	
+	<update id = "update">
+		update inquiry 
+		set redate = #{redate}, content_inquiry = #{content_inquiry}
+		where inquiryidx = #{inquiryidx}; 
+	</update>
+	
+	<select id = "getStatusByInquiryidx">
+		select status from inquiry
+		where inquiryidx = #{inquiryidx}; 
+	</select>
+	
+	<update id = "inquiryAnswer">
+		update inquiry 
+		set adminidx = #{adminidx}, answer_redate = #{answer_redate}, content_answer = #{content_answer}, status = #{status}
+		where inquiryidx = #{inquiryidx};
+	</update>
+	
+	<update id = "inquiryAnswerDelete">
+		update inquiry
+		set adminidx = #{adminidx}, answer_redate = null, content_answer = null, status = "답변 대기"
+		where where inquiryidx = #{inquiryidx};
+	</update>
+	
+	<update id = "inquiryAnswerUpdate">
+		update inquiry
+		set adminidx = #{adminidx}, answer_redate = #{answer_idx}, content_answer = #{content_answer}, status = "답변 완료"
+		where where inquiryidx = #{inquiryidx};
+	</update>
+	
+</mapper>
