@@ -25,8 +25,6 @@ public interface ItemMapper {
 	
 	List<Item> getItems(@Param("shopidx") int shopidx);
 	
-	void deleteItemEndtime(@Param("time") String time);
-	
 	void pushAlarm(@Param("shopidx") int shopidx);
 	
 	void deleteTimeoutAlarm();
@@ -47,5 +45,6 @@ public interface ItemMapper {
 	
 	void increaseQuantity(int itemidx, int number);
 	
-	void checkTrust(String time);
+	void decreaseTrust(String time);
+	void setConfirmToFalse(String time);
 }

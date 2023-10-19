@@ -93,6 +93,7 @@ public class ItemController {
       if(Image != null) {
          String fullPath = fileDir + Image.getOriginalFilename();
          Image.transferTo(new File(fullPath));
+         log.info("fullPath = {}", fullPath);
          item.setImage(Image.getOriginalFilename());
       }
       else {
@@ -138,7 +139,7 @@ public class ItemController {
 	   int itemidx = Integer.parseInt(ii);
 	   int number = Integer.parseInt(num);
 	   
-	   Reservation reservation = new Reservation(0,memberidx,shopidx,itemidx,number,null,false);
+	   Reservation reservation = new Reservation(0,memberidx,shopidx,itemidx,number,null,"wait");
 	   
 	   itemService.reservation(reservation, shopname, itemname, name, phone);
 	   return "";
@@ -175,6 +176,7 @@ public class ItemController {
 	   
 	   return "";
    }
+   
    
    /*
     * String을 Timestamp로 변환하는 함수

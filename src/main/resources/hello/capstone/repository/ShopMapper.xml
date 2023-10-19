@@ -21,10 +21,11 @@
 	</select>
 	
 	<select id = "getShops" resultType = "Shop">
-		select distinct s.*
-		from shop s
-		inner join item i ON s.shopidx = i.shopidx;
-	</select>
+    	select distinct s.*
+        from shop s
+        inner join item i ON s.shopidx = i.shopidx
+        where i.endtime &gt;= now();
+    </select>
 	
 	<select id = "getShopByMember" resultType = "hashmap">
 		select * 
@@ -39,10 +40,12 @@
 	</update>
 	
 	<select id = "runPriceFilter" resultType = "Shop">
-		select * from shop where shopidx in (
-			select distinct shopidx from item where salecost &lt;= #{price}
-		);
-	</select>
+	      select * 
+	      from shop 
+	      where shopidx in (
+	         select distinct shopidx from item where salecost &lt;= #{price} and i.endtime &lt;= now();
+	      );
+    </select>
 	
 	<select id = "runRatingFilter" resultType = "Shop">
 		select * from shop where #{rating} &lt;= rating

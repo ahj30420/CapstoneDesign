@@ -45,7 +45,7 @@ public class ShopService {
 	String kakaoLocalKey;
 	String uri = "https://dapi.kakao.com/v2/local/search/address.json";
 	
-public boolean saveShop(Shop shop, String method) {
+	public boolean saveShop(Shop shop, String method) {
 		
 		log.info("saveShop Start");
 		

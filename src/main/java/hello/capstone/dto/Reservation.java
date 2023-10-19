@@ -15,6 +15,6 @@ public class Reservation {
 	private int itemidx;
 	private int number;
 	private Date redate;
-	private boolean confirm;
+	private String confirm;
 	
 }

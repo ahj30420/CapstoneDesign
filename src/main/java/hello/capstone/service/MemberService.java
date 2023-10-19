@@ -33,7 +33,7 @@ public class MemberService {
 	/*
 	 * 멤버의 멤버인덱스 조회
 	 */
-	public int getMeberIdx(Member member) {
+	public int getMemberIdx(Member member) {
 		int idx = memberRepository.getMeberIdx(member);
 		return idx;
 	}

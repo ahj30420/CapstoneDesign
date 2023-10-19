@@ -52,7 +52,7 @@ public class ShopController {
 		
 		
 		Member ownerMember = (Member)session.getAttribute("member");
-		int memberidx = memberService.getMeberIdx(ownerMember);
+		int memberidx = memberService.getMemberIdx(ownerMember);
 		
 		Shop shop = new Shop();
 		shop.setShopName(shopName);
@@ -115,7 +115,6 @@ public class ShopController {
 	@GetMapping("/ShopMarker")
 	public List<Shop> ShopAddress(HttpSession session){
 		List<Shop> shops = shopService.getShops();
-		
 		return shops;
 	} 
 	
@@ -126,7 +125,7 @@ public class ShopController {
 	public List<Shop> getMyShop(HttpSession session){
 		Member member = (Member) session.getAttribute("member");
 		
-		List<Shop> shops = shopService.getShopByMember(memberService.getMeberIdx(member));
+		List<Shop> shops = shopService.getShopByMember(memberService.getMemberIdx(member));
 		
 		return shops;
 	}
@@ -212,9 +211,5 @@ public class ShopController {
        shopService.setRating(ratings);
        return "";
     } 
-
-	
-	
-	
 
 }

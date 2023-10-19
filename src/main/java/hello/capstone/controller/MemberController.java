@@ -1,7 +1,10 @@
 package hello.capstone.controller;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.apache.commons.lang3.tuple.Pair;
 
+import hello.capstone.dto.AlarmWithBefore;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import hello.capstone.dto.Alarm;
@@ -46,7 +51,7 @@ public class MemberController {
 		
 		log.info("member = {} ", member);
 		
-		int memberIdx = memberService.getMeberIdx(member);
+		int memberIdx = memberService.getMemberIdx(member);
 		int shopIdx = shopService.getShopIdx(shop);
 		
 		memberService.bookmarkRegistration(memberIdx, shopIdx);
@@ -56,23 +61,20 @@ public class MemberController {
 	}
 	
 	/*
-	 * 즐겨찾기 취소
-	 */
-	@DeleteMapping("/bookmark/delete")
-	public String bookmarkDelete(HttpSession session, @RequestBody Shop shop) {
-		Member member = (Member) session.getAttribute("member");
-		
-		log.info("member = {} ", member);
-		
-		int memberIdx = memberService.getMeberIdx(member);
-		int shopIdx = shopService.getShopIdx(shop);
-		
-		memberService.bookmarkDelete(memberIdx, shopIdx);
-		
-
-		return "/home_user";
-	}
-	
+    * 즐겨찾기 삭제
+    */
+    @PostMapping("/bookmark/delete")
+    public List<Shop> bookmarkDelete(HttpSession session, @RequestBody List<Shop> shops) {
+       Member member = (Member) session.getAttribute("member");
+  
+       for (Shop shop : shops) {
+          log.info("Shop={}", shop);
+          memberService.bookmarkDelete(member.getMemberIdx(), shop.getShopidx());
+         }
+       
+       List<Shop> MyBookmarkedShops = bookmarkCheck(session);
+       return MyBookmarkedShops;
+    }
 	
 	/*
 	 * 즐겨찾기 목록 조회
@@ -81,12 +83,10 @@ public class MemberController {
 	public List<Shop> bookmarkCheck(HttpSession session) {
 		Member member = (Member) session.getAttribute("member");
 		
-		int memberIdx = memberService.getMeberIdx(member);
+		int memberIdx = memberService.getMemberIdx(member);
 		
 		List<Shop> MyBookmarkedShops = memberService.getMyBookmarkedShop(memberIdx);
 		log.info("MyBookmarkedShops = {} ", MyBookmarkedShops);
-		
-		
 		
 		return MyBookmarkedShops;
 	}
@@ -167,17 +167,30 @@ public class MemberController {
 	 * 알람 가져오기
 	 */
 	@GetMapping("/getAlarm")
-	public List<Shop> getAlarm(HttpSession session){
+	public List<AlarmWithBefore> getAlarm(HttpSession session){
 		Member member = (Member) session.getAttribute("member");
-		List<Shop> alarmShop = new ArrayList<Shop>();
+		List<AlarmWithBefore> alarmList = new ArrayList<AlarmWithBefore>();
 		
-		List<Alarm> shopIdxes = itemService.getAlarm(memberService.getMeberIdx(member));
-		for (Alarm idx : shopIdxes) {
-			alarmShop.add(shopService.getShopByIdx(idx.getShopIdx()));
+		
+		List<Alarm> alarms = itemService.getAlarm(memberService.getMemberIdx(member));
+		for (Alarm alarm : alarms) {
+			Shop alarmShop = shopService.getShopByIdx(alarm.getShopIdx());
+			int before = getHowBefore(alarm.getRegisdate());
+			//<즐겨찾기한 가게>와 <아이템이 몇시간전에 올라왔는지> Pair
+			alarmList.add(new AlarmWithBefore(alarmShop, before));	
 		}
 		
-		return alarmShop;
+		// Integer 크기 순으로 오름차순 정렬
+        Collections.sort(alarmList, new Comparator<AlarmWithBefore>() {
+            @Override
+            public int compare(AlarmWithBefore shop1, AlarmWithBefore shop2) {
+                return Integer.compare(shop1.getBefore(), shop2.getBefore());
+            }
+        });
+		
+		return alarmList;
 	}
+	
 	
 	/*
 	 * 읽은 알람 삭제
@@ -185,6 +198,25 @@ public class MemberController {
 	@DeleteMapping("deleteReadAlarm")
 	public void deleteReadAlarm(@RequestBody Shop shop, HttpSession session) {
 		itemService.deleteReadAlarm(shop, (Member)session.getAttribute("member"));
+	}
+	
+	
+//----------------------------------------------------------------------------------------------------------
+	
+	
+	/*
+	 * 아이템등록시간과 현재 시간의 차이. (몇시간 전에 올라온 아이템인지)
+	 */
+	private int getHowBefore(Timestamp regisdate) {
+		//MySql의 Timestamp의 타임존을 반영
+		Timestamp newRegisdate = new Timestamp(regisdate.getTime() - (9 * 60 * 60 * 1000));
+
+		Date now = new Date();
+        Timestamp current = new Timestamp(now.getTime());
+        
+        long before = (current.getTime() - newRegisdate.getTime())/1000/60/60;
+        
+        return (int)before;
 	}
 	
 }

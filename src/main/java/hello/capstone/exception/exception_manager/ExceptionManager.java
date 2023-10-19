@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import hello.capstone.dto.Response;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.NicknameException;
+import hello.capstone.exception.NullContentException;
+import hello.capstone.exception.NullPhoneException;
+import hello.capstone.exception.NullTitleException;
 import hello.capstone.exception.QuantityException;
 import hello.capstone.exception.SaveItemException;
 import hello.capstone.exception.SaveShopException;
@@ -121,6 +124,24 @@ public class ExceptionManager {
 	//(15) 기존에 만들어둔 에러(InquiryException)가 발생시 동작
 	@ExceptionHandler(InquiryException.class)
 	public ResponseEntity<?> InquiryExceptionHandler(InquiryException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
+	//(16) 기존에 만들어둔 에러(NullTitleException)가 발생시 동작
+	@ExceptionHandler(NullTitleException.class)
+	public ResponseEntity<?> NullTitleExceptionHandler(NullTitleException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
+	//(17) 기존에 만들어둔 에러(NullContentException)가 발생시 동작
+	@ExceptionHandler(NullContentException.class)
+	public ResponseEntity<?> NullContentExceptionHandler(NullContentException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	}
+	//(18) 기존에 만들어둔 에러(NullPhoneException)가 발생시 동작
+	@ExceptionHandler(NullPhoneException.class)
+	public ResponseEntity<?> NullPhoneExceptionHandler(NullPhoneException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
 	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
 	}

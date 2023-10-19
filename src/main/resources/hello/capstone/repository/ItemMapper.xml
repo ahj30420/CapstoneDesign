@@ -20,14 +20,8 @@
 	<select id = "getItems" resultType = "Item">
 		select * 
 		from item 
-		where shopidx = #{shopidx};
+		where shopidx = #{shopidx} and endtime &gt;= now();
 	</select>
-	
-	<delete id="deleteItemEndtime" >
-	    DELETE FROM item
-	    WHERE endtime &lt;= #{time};
-	</delete>
-	
 
 	<insert id="pushAlarm">
         insert into alarm (memberidx, shopidx,regisdate)
@@ -85,15 +79,21 @@
 		where itemidx = #{itemidx}; 
 	</update>
 	
-	<update id = "checkTrust">
-		update member as m
-		set trust = trust - 1
-		where m.memberidx in
-			(select memberidx from 
-				(select memberidx, confirm 
-	 			 from reservation as r left join item as i 
-     			 on r.itemidx = i.itemidx
-     			 where i.endtime &lt;= #{time}) as c
-			 where c.confirm = false);
-	</update>
+	<update id="decreaseTrust">
+       UPDATE member
+       SET trust = trust - 1
+       WHERE memberidx IN (
+           SELECT r.memberidx
+           FROM reservation AS r
+           LEFT JOIN item AS i ON r.itemidx = i.itemidx
+           WHERE i.endtime &lt;= #{time} AND r.confirm = 'wait'
+       );
+   </update>
+   
+   <update id="setConfirmToFalse">
+       UPDATE reservation AS r
+       INNER JOIN item AS i ON r.itemidx = i.itemidx
+       SET r.confirm = 'false'
+       WHERE i.endtime &lt;= #{time} AND r.confirm = 'wait';
+   </update>
 </mapper>

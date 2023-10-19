@@ -10,6 +10,7 @@ import lombok.Data;
 
 @Data
 public class Member {
+	private int memberIdx;
 	private String id;
 	private String pw;
 	private String name;
@@ -35,6 +36,6 @@ public class Member {
 		this.role = role;
 		this.redate = redate;
 		this.trust = trust;
-	}	
-	
+	}
+
 }

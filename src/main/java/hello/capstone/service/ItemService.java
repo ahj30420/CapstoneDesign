@@ -17,6 +17,7 @@ import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Reservation;
 import hello.capstone.dto.Shop;
+import hello.capstone.exception.NullPhoneException;
 import hello.capstone.exception.QuantityException;
 import hello.capstone.exception.SaveItemException;
 import hello.capstone.exception.SaveShopException;
@@ -70,6 +71,7 @@ public class ItemService {
 		itemRepository.saveitem(item, method);
 		
 		itemRepository.pushAlarm(item.getShopidx());
+		log.info("shopidx = {}", item.getShopidx());
 		
 		return true;
 	}
@@ -103,17 +105,16 @@ public class ItemService {
 	
 	
 	/*
-	 * 1분마다 실행되는 cron표현식 item들에 마감시간을 확인하여 시간이 지나면 자동 삭제
+	 * 1분마다 실행되는 cron표현식 item들에 마감시간을 확인하여 신뢰점수 차감
 	 */
 	@Scheduled(cron ="0 * * * * *")
-	public void deleteItemEndtime() {
+	public void checkItemEndtime() {
 		log.info("item @Scheduled 실행");
 		LocalDateTime now = LocalDateTime.now();
 		Timestamp timestamp = Timestamp.valueOf(now);
 
         // 현재 시간보다 이전인 아이템 삭제
 		itemRepository.checkTrust(timestamp);
-		itemRepository.deleteItemEndtime(timestamp);
 	}
 	
 	/*
@@ -133,6 +134,10 @@ public class ItemService {
 		int number = reservation.getNumber();
 		int itemidx = reservation.getItemidx();
 		int quantity = itemRepository.getQuantityByitemIdx(itemidx);
+		
+		if(phone == null) {
+			throw new NullPhoneException(ErrorCode.NULL_PHONE, null);
+		}
 		
 		if(quantity < number) {
 			throw new QuantityException(ErrorCode.EXCESS_QUANTITY,null);
