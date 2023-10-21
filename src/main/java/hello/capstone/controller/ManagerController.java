@@ -112,8 +112,6 @@ public class ManagerController {
 	}
 	
 	
-	//-----------------------------------------------------------------------------------------------
-	
 	
 	//사용자 관리---------------------------------------------------------------------------------------
 	
@@ -147,7 +145,6 @@ public class ManagerController {
 		
 		return managerService.getFailedItems(shopIdx);
 	}
-	//-----------------------------------------------------------------------------------------------
 	
 	
 	//상업자 관리---------------------------------------------------------------------------------------
@@ -178,7 +175,6 @@ public class ManagerController {
 		return managerService.getIteminfoByBusiness(shopidx);
 	}
 	
-	//-----------------------------------------------------------------------------------------------
 	
 	
 	//관리자 관리---------------------------------------------------------------------------------------
@@ -192,7 +188,6 @@ public class ManagerController {
 		return managerService.getMemberByRole("관리자");
 	}
 	
-	//-----------------------------------------------------------------------------------------------
 	
 	
 	//가게 분석---------------------------------------------------------------------------------------
@@ -206,11 +201,36 @@ public class ManagerController {
 	}
 	
 	/*
-	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회
+	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회(1)
 	 */
 	@GetMapping("/analysis/item")
 	public List<Map<String, Object>> AnalysisItem(@RequestParam("shopidx") int shopidx){
 		return managerService.getIteminfo(shopidx);
+	}
+	
+	/*
+	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회(2) -> 예약자 수 클릭시 예약자 정보와 예약한 상품 수, 구매 확정 여부 표시
+	 */
+	@GetMapping("/analysis/item/reservation/client")
+	public List<Map<String, Object>> AnalysisReservationClient(@RequestParam("itemidx") int itemidx){
+		return managerService.getReservationClient(itemidx);
+	}
+	
+	/*
+	 * 별점 카테고리(0,1,2,3,4,5) 별 인원수(1)
+	 */
+	@GetMapping("/analysis/rating")
+	public List<Map<String, Object>> AnalysisRating(@RequestParam("shopidx") int shopidx){
+		return managerService.getRatingNumber(shopidx);
+	}
+	
+	/*
+	 * 별점 카테고리(0,1,2,3,4,5) 별 인원수(2) -> 인원수 클릭시 해당 별점을 입력했던 사용자 정보 표시
+	 */
+	@GetMapping("/analysis/rating/client")
+	public List<Map<String, Object>> AnalysisRatingClient(@RequestParam("shopidx") int shopidx,
+														  @RequestParam("rating") int rating){
+		return managerService.getRatingClient(shopidx, rating);
 	}
 	
 	/*
@@ -220,5 +240,47 @@ public class ManagerController {
 	public List<Member> AnalysisReservation(@RequestParam("shopidx") int shopidx){
 		return managerService.getReservationMember(shopidx);
 	}
-	//-----------------------------------------------------------------------------------------------
+
+	
+	//검색---------------------------------------------------------------------------------------------------
+	
+	/*
+	 * 모든 아이템 나열
+	 */
+	@GetMapping("/item/all")
+	public List<Map<String, Object>> getItemAll(){
+		
+		return managerService.getItemAll();
+	}
+	
+	
+	/*
+	 * 이름으로 회원검색 - 이름순, 날짜순
+	 */
+	@GetMapping("/search/member")
+	public List<Member> searchMemberByName(@RequestParam("name") String name){
+		
+		return managerService.searchMemberByName(name);
+	}
+	
+	
+	/*
+	 * 이름으로 가게검색 - 이름순, 날짜순 주인이름 포함
+	 */
+	@GetMapping("/search/shop")
+	public List<Map<String, Object>> searchShopByName(@RequestParam("shopname") String shopName){
+		
+		return managerService.searchShopByName(shopName);
+	}
+	
+	
+	/*
+	 * 이름으로 아이템검색 - 이름순, 날짜순 가게이름 포함
+	 */
+	@GetMapping("/search/item")
+	public List<Map<String, Object>> searchItemByName(@RequestParam("itemname") String itemName){
+		
+		return managerService.searchItemByName(itemName);
+	}
+	
 }

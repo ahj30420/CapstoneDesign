@@ -1,6 +1,8 @@
 package hello.capstone.service;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -14,12 +16,20 @@ import hello.capstone.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class InquiryService {
 
 	private final InquiryRepository inquiryRepository;
+	
+	/*
+	 * 1:1문의 나열
+	 */
+	public List<Map<String, Object>> inquiryView(){
+		return inquiryRepository.inquiryView();
+	}
 	
 	/*
 	 * 1:1문의 등록

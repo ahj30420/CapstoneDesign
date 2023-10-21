@@ -3,6 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="hello.capstone.repository.InquiryMapper">
 
+	<select id = "inquiryView" resultType ="Map">
+		select i.*, m.name
+		from inquiry i 
+		inner join member m on i.useridx = m.memberidx
+		order by redate asc;
+	</select>
+
 	<insert id = "register">
 		insert into inquiry(useridx, redate, content_inquiry)
 		values(#{useridx}, #{redate}, #{content_inquiry});

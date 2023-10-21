@@ -1,8 +1,11 @@
 package hello.capstone.controller;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 public class InquiryController {
 
 	private final InquiryService inquiryService;
+	
+	/*
+	 * 1:1문의 전체 나열
+	 */
+	@GetMapping("/view")
+	public List<Map<String, Object>> inquiryView(){
+		return inquiryService.inquiryView();
+		
+	}
 	
 	/*
 	 * 1:1문의 등록

@@ -1,6 +1,8 @@
 package hello.capstone.repository;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -9,6 +11,8 @@ import hello.capstone.dto.Inquiry;
 
 @Mapper
 public interface InquiryMapper {
+	
+	List<Map<String, Object>> inquiryView();
 
 	void register(Inquiry inquiry);
 	

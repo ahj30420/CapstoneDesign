@@ -1,6 +1,8 @@
 package hello.capstone.repository;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 public class InquiryRepository {
 
 	private final InquiryMapper inquiryMapper;
+	
+	/*
+	 * 1:1문의 나열
+	 */
+	public List<Map<String, Object>> inquiryView(){
+		return inquiryMapper.inquiryView();
+	}
 	
 	/*
 	 * 1:1문의 등록

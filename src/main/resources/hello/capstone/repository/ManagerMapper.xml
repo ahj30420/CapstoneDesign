@@ -86,12 +86,55 @@
    	</select>
    	
    	<select id="getIteminfo" resultType="map">
-	   	select i.*, sum(r.number) as reservation_count from item as i
-		join reservation as r
+		select i.*,
+		       count(r.memberidx) as Reservation_client,
+		       sum(case when r.confirm &lt;&gt; 'false' then r.number else 0 end) as reservation_number,
+		       CASE 
+		           WHEN i.endtime &lt;= NOW() THEN '마감' 
+		           ELSE '진행중' 
+			   END AS status 
+		from item as i
+		left join reservation as r
 		on i.itemidx = r.itemidx
-		where i.shopidx = #{shopidx}
-		group by r.itemidx
-		order by itemname asc;
+		where i.shopidx = 3
+		group by i.itemidx
+		order by i.itemname asc;
+   	</select>
+   	
+   	<select id="getReservationClient" resultType="map">
+   		select m.*,
+		       r.number as  reservation_number,
+		       r.confirm
+		from member as m
+		left join reservation as r
+		on m.memberidx = r.memberidx
+		where r.itemidx = #{itemidx}
+		order by m.name asc;
+   	</select>
+   	
+   	<select id="getRatingNumber" resultType="map">
+	   	SELECT r.rating, COALESCE(COUNT(rt.rating), 0) as rating_count
+		FROM (
+			    SELECT 0 AS rating
+			    UNION ALL SELECT 1
+			    UNION ALL SELECT 2
+			    UNION ALL SELECT 3
+			    UNION ALL SELECT 4
+			    UNION ALL SELECT 5
+			) AS r
+		LEFT JOIN ratings AS rt 
+		ON r.rating = rt.rating AND rt.shopidx = #{shopidx}
+		GROUP BY r.rating
+		ORDER BY r.rating;
+   	</select>
+   	
+   	<select id="getRatingClient" resultType="map">
+   		select m.* 
+		from member as m
+		left join ratings as r
+		on m.memberidx = r.memberidx
+		where r.rating = #{rating} and r.shopidx = #{shopidx}
+		order by m.name asc;
    	</select>
    	
    	<select id="getReservationMember" resultType="Member">
@@ -100,5 +143,42 @@
 		on m.memberidx = r.memberidx
 		where r.shopidx = #{shopidx} and r.confirm = "true";
    	</select>
+   	
+   		<select id = "getItemAll" resultType ="Map">
+		select i.*, s.shopname
+		from item i
+		inner join shop s on i.shopidx = s.shopidx
+		order by i.itemname asc , i.starttime asc;
+	
+	</select>
+	
+	
+	<select id ="searchMemberByName">
+		select *
+		from member
+		where name like concat('%', #{name}, '%')
+		order by name asc, redate asc;
+	
+	</select>
+	
+	<select id="searchShopByName">
+		select s.*, m.name
+		from shop s
+		inner join member m
+		on s.owneridx = m.memberidx
+		where s.shopname like concat('%', #{shopName}, '%')
+		order by s.shopname asc, s.registrationDate asc;
+	
+	</select>
+	
+	<select id="searchItemByName">
+		select i.*, s.shopname
+		from item i
+		inner join shop s
+		on i.shopidx = s.shopidx
+		where i.itemname like concat('%', #{itemName}, '%')
+		order by i.itemname asc, i.starttime asc;
+	
+	</select>
    	
 </mapper>
