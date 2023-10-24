@@ -1,12 +1,16 @@
 package hello.capstone.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -17,6 +21,7 @@ import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Reservation;
 import hello.capstone.dto.Shop;
+import hello.capstone.exception.ExistReservationException;
 import hello.capstone.exception.NullPhoneException;
 import hello.capstone.exception.QuantityException;
 import hello.capstone.exception.SaveItemException;
@@ -89,10 +94,30 @@ public class ItemService {
 	}
 	
 	/*
+	 * 아이템 삭제
+	 */
+	public void itemDelete(Item item) {
+		// 아이템을 예약한 사람이 있는지 확인
+		if(itemRepository.reservationCheck(item) != 0){
+			throw new ExistReservationException(ErrorCode.EXIST_RESERVATION_PERSON,null);
+		}
+		itemRepository.itemDelete(item);
+		
+		
+	}
+	
+	/*
 	 * 알림 가져오기
 	 */
-	public List<Alarm> getAlarm(int memberidx){
-		return itemRepository.getAlarm(memberidx);
+	public List<Map<String, Object>> getAlarm(int memberidx){
+		List<Map<String, Object>> alarms = itemRepository.getAlarm(memberidx);
+		
+		for (Map<String, Object> alarm : alarms) {
+			int howBefore = getHowBefore((Timestamp)alarm.get("before"));	
+			alarm.replace("before", howBefore);
+		}
+		
+		return alarms;
 	}
 	
 	/*
@@ -164,12 +189,24 @@ public class ItemService {
 	/*
 	 * 상품 예약 취소
 	 */
-	public void reservationCancel(int ridx, int itemidx, int number, String name, String phone) {
-		itemRepository.reservationCancel(ridx, itemidx, number);
+	public void reservationCancel(List<Map<String, Object>> reservationinfo, String name, String phone) {
 		
+		for(Map<String, Object> info : reservationinfo) {
+			int ridx = (int)info.get("reservationidx");
+			int itemidx = (int)info.get("itemidx");
+			int number = (int)info.get("number");
+			itemRepository.reservationCancel(ridx, itemidx, number);
+		}
 		String content = "[재고30]\n" + name + "님 정상적으로 예약이 취소되었습니다.\n";
 		sendMessage(phone, content);
 	}
+	
+    /*
+     * 예약 상품 리스트 조회
+     */
+    public List<Map<String, Object>> getReservations(int memberidx){
+    	return itemRepository.getReservations(memberidx);
+    }
 	
 	/*
 	 * 인증 메시지
@@ -190,4 +227,23 @@ public class ItemService {
         return response;
 	}
 	
+	
+	//----------------------------------------------------------------------------------------------------------
+	
+	
+	/*
+	 * 아이템등록시간과 현재 시간의 차이. (몇시간 전에 올라온 아이템인지)
+	 */
+	private int getHowBefore(Timestamp regisdate) {
+		//MySql의 Timestamp의 타임존을 반영
+		Timestamp newRegisdate = new Timestamp(regisdate.getTime() - (9 * 60 * 60 * 1000));
+		
+		Calendar calendar = Calendar.getInstance();
+		java.util.Date now = calendar.getTime();
+        Timestamp current = new Timestamp(now.getTime());
+        
+        long before = (current.getTime() - newRegisdate.getTime())/1000/60/60;
+        
+        return (int)before;
+	}
 }

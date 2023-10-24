@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,13 +26,17 @@ public interface ItemMapper {
 	
 	List<Item> getItems(@Param("shopidx") int shopidx);
 	
+	void itemDelete(Item item);
+	
+	int reservationCheck(Item item);
+	
 	void pushAlarm(@Param("shopidx") int shopidx);
 	
 	void deleteTimeoutAlarm();
 	
 	void deleteReadAlarm(@Param("shop") Shop shop, @Param("member") Member member);
 	
-	List<Alarm> getAlarm(@Param("memberidx") int memberidx);
+	List<Map<String,Object>> getAlarm(@Param("memberidx") int memberidx);
 	
 	int getQuantity(int itemidx);
 	
@@ -43,8 +48,11 @@ public interface ItemMapper {
 	
 	void reservationDelete(int ridx);
 	
-	void increaseQuantity(int itemidx, int number);
+	List<Map<String, Object>> getReservations(int memberidx);
+	
+	void increaseQuantity(@Param("itemidx")int itemidx, @Param("number")int number);
 	
 	void decreaseTrust(String time);
+	
 	void setConfirmToFalse(String time);
 }

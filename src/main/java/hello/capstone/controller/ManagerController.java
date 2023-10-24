@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import hello.capstone.dto.AlarmWithBefore;
 import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Notice;
@@ -85,30 +84,15 @@ public class ManagerController {
 	}
 	
 	
+	/*
+	 * 공지사항 알림 가져오기
+	 */
 	@GetMapping("/notice/getalarm")
-	public List<AlarmWithBefore> getNoticeAlarm(){
-		List<AlarmWithBefore> alarmNotices = new ArrayList<AlarmWithBefore>();
-		List<Notice> notices = managerService.noticeReadAll();
-		//24시간 이전에 올라온 공지사항만 가져오기
-		for(Notice notice : notices) {
-			
-			LocalDateTime dateTime = LocalDateTime.now();
-			Timestamp timestamp = Timestamp.valueOf(dateTime);
-			//MySql의 타임존을 반영하여 9시간을 더해줌.
-			Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
-			//시간단위로 차이 구하기
-	        int before = (int) ((now.getTime() - notice.getNoticeDate().getTime()) / (1000 * 60 * 60));
-	        
-	        
-	        // 만약 24시간 이내라면 알림 리스트에 추가
-	        if (before <= 24) {
-	            AlarmWithBefore alarm = new AlarmWithBefore(notice, before);
-	            alarmNotices.add(alarm);
-	        }
-		}
+	public List<Map<String, Object>> getNoticeAlarm(){
+		List<Map<String, Object>> notices = managerService.noticeGetAlarm();
+
 		
-		
-		return alarmNotices;
+		return notices;
 	}
 	
 	

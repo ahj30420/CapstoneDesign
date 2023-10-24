@@ -23,6 +23,19 @@
 		where shopidx = #{shopidx} and endtime &gt;= now();
 	</select>
 
+	<delete id ="itemDelete">
+		delete
+		from item
+		where itemidx = #{itemidx};
+	</delete>
+	
+	<select id = "reservationCheck">
+		select count(*)
+		from reservation 
+		where itemidx = #{itemidx} and confirm != 'true';
+	
+	</select>
+
 	<insert id="pushAlarm">
         insert into alarm (memberidx, shopidx,regisdate)
 		select b.memberidx, b.shopidx,NOW() 
@@ -42,10 +55,12 @@
 		where shopidx = #{shop.shopidx} and memberidx = #{member.memberidx}
    </delete>
 	
-	<select id = "getAlarm" resultType="Alarm">
-		Select *
-		from alarm
-		where memberidx = #{memberidx};
+	<select id = "getAlarm" resultType="Map">
+		select s.*, a.regisdate as 'before'
+		from shop s
+		inner join alarm a on s.shopidx = a.shopidx
+		where a.memberidx = #{memberidx}
+		order by a.regisdate asc;
 	</select>
 	
 	<select id = "getQuantity">
@@ -73,6 +88,14 @@
 		delete from reservation
 		where reservationidx = #{ridx};
 	</delete>
+	
+	<select id="getReservations" resultType="map">
+		SELECT r.reservationidx, s.shopname, s.shopaddress, i.itemidx, i.itemname, i.image, r.number
+		FROM reservation r
+		JOIN shop s ON r.shopidx = s.shopidx
+		JOIN item i ON r.itemidx = i.itemidx
+		WHERE r.memberidx = #{memberidx} and r.confirm = "wait";
+	</select>
 	
 	<update id = "increaseQuantity">
 		update item set quantity = quantity + #{number}

@@ -26,7 +26,8 @@ public enum ErrorCode {
 	NULL_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "내용을 입력하세요."),
 	EXCESS_QUANTITY(HttpStatus.CONFLICT, "예약하고자하는 양이 남아있는 수량을 초과하였습니다"),
 	EXIST_ANSWER(HttpStatus.CONFLICT, "답변이 존재하여 더 이상 수정 할 수 없습니다."),
-	NULL_PHONE(HttpStatus.UNPROCESSABLE_ENTITY, "핸드폰 번호를 입력하세요.");
+	NULL_PHONE(HttpStatus.UNPROCESSABLE_ENTITY, "핸드폰 번호를 입력하세요."),
+	EXIST_RESERVATION_PERSON(HttpStatus.UNPROCESSABLE_ENTITY, "해당 상품을 예약한 사용자가 존재합니다. \n예약자 명단을 확인 후 상품을 삭제해주세요");
 	
 	private HttpStatus status;
 	private String message;

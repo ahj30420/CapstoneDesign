@@ -58,7 +58,12 @@ public class ManagerRepository {
 		return managerMapper.noticeReadAll();
 	}
 	
-	
+	/*
+	 * 공지사항 알림
+	 */
+	public List<Map<String, Object>> noticeGetAlarm(){
+		return managerMapper.noticeGetAlarm();
+	}
 	
 	//사용자 관리---------------------------------------------------------------------------------------
 	

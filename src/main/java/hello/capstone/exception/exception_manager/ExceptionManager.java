@@ -20,6 +20,7 @@ import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.TimeSettingException;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.CodeVerificationException;
+import hello.capstone.exception.ExistReservationException;
 import hello.capstone.exception.FindPwException;
 import hello.capstone.exception.InquiryException;
 import hello.capstone.exception.InvalidEmailException;
@@ -145,4 +146,10 @@ public class ExceptionManager {
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
 	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
 	}
+	//(19) 기존에 만들어둔 에러(ExistReservationException)가 발생시 동작
+		@ExceptionHandler(ExistReservationException.class)
+		public ResponseEntity<?> ExistReservationExceptionHandler(ExistReservationException e){
+		   return ResponseEntity.status(e.getErrorCode().getStatus())
+		           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+		}
 }

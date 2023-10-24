@@ -40,15 +40,18 @@
 	</update>
 	
 	<select id = "runPriceFilter" resultType = "Shop">
-	      select * 
-	      from shop 
-	      where shopidx in (
-	         select distinct shopidx from item where salecost &lt;= #{price} and i.endtime &lt;= now();
-	      );
-    </select>
+		select * 
+		from shop 
+		where shopidx in (
+			select distinct shopidx from item where salecost &lt;= #{price} and endtime &gt;= #{now()}
+		);
+	</select>
 	
 	<select id = "runRatingFilter" resultType = "Shop">
-		select * from shop where #{rating} &lt;= rating
+		select distinct s.*
+		from shop s 
+		join item i on s.shopidx = i.shopidx
+		where #{rating} &lt;= s.rating and i.endtime &gt;= now();
 	</select>
 	
 	<update id = "setRatings">

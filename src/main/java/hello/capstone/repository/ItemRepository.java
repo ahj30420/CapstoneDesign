@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -57,6 +58,20 @@ public class ItemRepository {
 	}
 
 	/*
+	 * 아이템 삭제
+	 */
+	public void itemDelete(Item item) {
+		 itemMapper.itemDelete(item);
+	}
+	
+    /*
+    * 예약자가 있는 상품인지 확인
+    */
+	public int reservationCheck(Item item) {
+		return itemMapper.reservationCheck(item);
+	}
+	
+	/*
 	 * 알림 등록
 	 */
 	public void pushAlarm(int shopidx) {
@@ -67,10 +82,8 @@ public class ItemRepository {
 	/*
 	 * 알림 가져오기
 	 */
-	public List<Alarm> getAlarm(int memberidx) {
-		
-		return itemMapper.getAlarm(memberidx);
-		   
+	public List<Map<String, Object>> getAlarm(int memberidx) {
+		return itemMapper.getAlarm(memberidx);   
 	}
 	
 	/*
@@ -118,6 +131,13 @@ public class ItemRepository {
 		itemMapper.reservationDelete(ridx);
 		itemMapper.increaseQuantity(itemidx, number);
 	}
+	
+    /*
+     * 예약 상품 리스트 조회
+     */
+    public List<Map<String, Object>> getReservations(int memberidx){
+    	return itemMapper.getReservations(memberidx);
+    }
 	
 	/*
 	 * 예약자 실제 상품 결제 확인하여 신뢰점수 차감

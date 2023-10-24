@@ -104,7 +104,25 @@ public class ManagerService {
 		return managerRepository.noticeReadAll();
 	}
 	
-	
+	/*
+	 * 공지사항 알림
+	 */
+	public List<Map<String, Object>> noticeGetAlarm(){
+		List<Map<String, Object>> notices = managerRepository.noticeGetAlarm();
+		//24시간 이전에 올라온 공지사항만 가져오기
+		for(Map<String, Object> notice : notices) {
+			
+			LocalDateTime dateTime = LocalDateTime.now();
+			Timestamp timestamp = Timestamp.valueOf(dateTime);
+			//MySql의 타임존을 반영하여 9시간을 더해줌.
+			Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
+			//시간단위로 차이 구하기
+	        int before = (int) ((now.getTime() - ((Timestamp)notice.get("noticedate")).getTime()) / (1000 * 60 * 60));
+	        
+	        notice.put("before", before);
+		}
+		return notices;
+	}
 	
 	//사용자 관리---------------------------------------------------------------------------------------
 	

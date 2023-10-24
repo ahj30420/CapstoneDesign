@@ -32,7 +32,8 @@ public interface ManagerMapper {
 	//모든공지사항 읽기
 	List<Notice> noticeReadAll();
 	
-	
+	//공지사항 알림
+	List<Map<String, Object>> noticeGetAlarm();
 	
 	//사용자 관리---------------------------------------------------------------------------------------
 	

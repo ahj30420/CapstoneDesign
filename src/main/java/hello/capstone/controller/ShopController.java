@@ -137,7 +137,7 @@ public class ShopController {
     public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
                                   @RequestParam("longitude") String myLongitude,
                                   @RequestParam(value = "distance", defaultValue = "0") String distance,
-                                  @RequestParam(value = "unit", defaultValue = "m") String unit,
+                                  @RequestParam(value = "unit", defaultValue = "km") String unit,
                                   @RequestParam(value = "price", defaultValue = "0") String itemprice,
                                   @RequestParam(value = "time", defaultValue = "0") String time,
                                   @RequestParam(value = "rating", defaultValue = "0") String shoprating){
@@ -151,7 +151,7 @@ public class ShopController {
        double dist = Double.parseDouble(distance);
        int price = Integer.parseInt(itemprice);
        double rating = Double.parseDouble(shoprating);
-       long minute = Long.parseLong(time);
+       long minute = Long.parseLong(time) * 60;
 
        
        if(dist != 0) {

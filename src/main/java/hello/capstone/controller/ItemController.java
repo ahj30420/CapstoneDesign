@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -122,6 +124,14 @@ public class ItemController {
    }
    
    /*
+    * 아이템 삭제
+    */
+   @DeleteMapping("/delete")
+   public void itemDelete(@ModelAttribute Item item) {
+	   itemService.itemDelete(item);
+   }
+   
+   /*
     * 상품 예약
     */
    @PostMapping("/reservation")
@@ -162,21 +172,33 @@ public class ItemController {
     * 상품 예약 취소
     */
    @PostMapping("/reservation/cancel")
-   public String cancel(@RequestParam("reservationidx") String ridx,
-		   				@RequestParam("name") String name,
-		   				@RequestParam("phone") String phone,
-		   				@RequestParam("itemidx") String iidx,
-		   				@RequestParam("number") String num) {
+   public String cancel(HttpSession session, @RequestBody List<Map<String, Object>> reservationinfo) {
 	   
-	   int reservationidx = Integer.parseInt(ridx);
-	   int itemidx = Integer.parseInt(iidx);
-	   int number = Integer.parseInt(num);
+	   log.info("reservationinfo = {}", reservationinfo);
 	   
-	   itemService.reservationCancel(reservationidx, itemidx, number, name, phone);
+	   for(Map<String, Object> info : reservationinfo) {
+		   log.info("reservationidx = {}",info.get("reservationidx"));
+	   }
 	   
+	   Member member = (Member) session.getAttribute("member");
+	   String phone = member.getPhone();
+	   String name = member.getName();
+	   
+	   log.info("phone = {}", phone);
+	   log.info("name = {}", name);
+	   
+	   itemService.reservationCancel(reservationinfo, name, phone);
 	   return "";
    }
    
+   /*
+    * 예약 상품 리스트 조회
+    */
+   @GetMapping("/reservation/getreservations")
+   public List<Map<String, Object>> getReservations(HttpSession session){
+	   Member member = (Member) session.getAttribute("member");
+	   return itemService.getReservations(member.getMemberIdx());
+   }
    
    /*
     * String을 Timestamp로 변환하는 함수
