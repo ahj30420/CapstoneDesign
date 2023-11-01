@@ -1,6 +1,7 @@
 package hello.capstone.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +38,10 @@ public class ShopRepository {
 		}
 		log.info("repository shop = {}", shop);
 		return true;
+	}
+	
+	public void shopDelete(int shopidx) {
+		shopMapper.shopDelete(shopidx);
 	}
 	
 	/*
@@ -87,4 +92,11 @@ public class ShopRepository {
 	public void setRatings(int shopidx, double rating) {
 		shopMapper.setRatings(shopidx, rating);
 	}
+	
+    /*
+     * 해당 아이템 별로 예약자 리스트 조회
+     */
+    public List<Map<String, Object>> getItemReservations(int itemidx){
+    	return shopMapper.getItemReservations(itemidx);
+    }  
 }

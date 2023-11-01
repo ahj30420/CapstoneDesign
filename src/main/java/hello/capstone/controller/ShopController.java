@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +40,7 @@ public class ShopController {
 	private String fileDir;
 	
 	@PostMapping("/shopRegistration")
-	public String shopRegistration(@RequestParam(value = "imageFilename", required = false) MultipartFile Image,
+	public void shopRegistration(@RequestParam(value = "imageFilename", required = false) MultipartFile Image,
 								   @RequestParam(value = "shopidx", defaultValue = "0") String sidx,
 			  					   @RequestParam("shopName") String shopName,
 			  					   @RequestParam("shopTel") String shopTel,
@@ -88,8 +90,11 @@ public class ShopController {
 		log.info("파일 파라미터={}",Image);
 		
 		shopService.saveShop(shop, method);
-		
-		return "/home_user";
+	}
+	
+	@DeleteMapping("/shopDelete")
+	public void shopDelete(@RequestParam("shopidx") int shopidx) {
+		shopService.shopDelete(shopidx);
 	}
 	
 	/*
@@ -186,30 +191,36 @@ public class ShopController {
        return allShops;
     }
     
-    /*
-     * 별점 추가
-     */
-//    @PostMapping("/setRating")
-//    public String setRating(@RequestBody Ratings ratings) {
-//    	
-//    	shopService.setRating(ratings);
-//    	return "";
-//    } 
     
     /*
      * 별점 추가
      */
-    @GetMapping("/setRating")
-    public String setRating(@RequestParam int shopidx,
-                      @RequestParam int memberidx,
-                      @RequestParam int rating) {
+    @PostMapping("/setRating")
+    public void setRating(HttpSession session,
+                          @RequestParam("shopidx") int shopidx,
+                          @RequestParam("rating") int rating) {
        
        
+       Member member = (Member) session.getAttribute("member");
+       int memberidx = member.getMemberIdx(); 
        
        Ratings ratings = new Ratings(0,shopidx,memberidx,rating);
        
        shopService.setRating(ratings);
-       return "";
-    } 
-
+    }  
+    
+    /*
+     * 해당 아이템 별로 예약자 리스트 조회
+     */
+    @GetMapping("/shop/item/reservations")
+    public List<Map<String, Object>> getItemReservations(@RequestParam("itemidx") int itemidx){
+    	log.info("itemidx = {}", itemidx);
+    	
+    	List<Map<String, Object>> map = shopService.getItemReservations(itemidx);
+    	
+    	log.info("map.reservationidx={}", map.get(0).get("reservationidx"));
+    	
+    	return shopService.getItemReservations(itemidx);
+    }
+    
 }

@@ -1,9 +1,16 @@
 package hello.capstone.controller;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import hello.capstone.dto.Member;
 import hello.capstone.exception.CodeVerificationException;
 import hello.capstone.exception.SendMessageException;
+import hello.capstone.exception.ValidationException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.service.LoginService;
 import hello.capstone.service.MemberService;
+import hello.capstone.validation.ValidationSequence;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +39,31 @@ public class LoginController {
 	
 	private final LoginService loginService;
 	private final MemberService memberService;
+	private final PasswordEncoder bCryptPasswordEncoder;
+	
 	/*
 	 * 일반 회원 회원가입
 	 */
     @PostMapping("/join")
-    public String signUp(@RequestBody Member member){
+    public String signUp(@Validated(value = ValidationSequence.class) @RequestBody Member member, BindingResult bindingResult){
     	
     	log.info("id ={}",member.getId());
     	log.info("pw={}",member.getPw());
     	log.info("name ={}",member.getName());
     	log.info("phone={}",member.getPhone());
     	log.info("role={}",member.getRole());
+
+    	if(bindingResult.hasErrors()) {
+    		Map<String, String> errors = new HashMap<>();
+	    	for (FieldError error : bindingResult.getFieldErrors()) {
+	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
+	            errors.put(error.getField(), error.getDefaultMessage());
+	        }
+	    	throw new ValidationException(errors);
+    	}
+    	
+    	String pw = bCryptPasswordEncoder.encode(member.getPw());
+    	member.setPw(pw);
     	
     	boolean success = loginService.signUp(member);
     	

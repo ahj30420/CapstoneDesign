@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Delete;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -72,6 +75,10 @@ public class ShopService {
 		log.info("shop info = {}", shop);
 		
 		return shopRepository.saveShop(shop,method);
+	}
+	
+	public void shopDelete(int shopidx) {
+		shopRepository.shopDelete(shopidx);
 	}
 	
 	/*
@@ -223,25 +230,38 @@ public class ShopService {
      * 별점 추가하기
      */
     public boolean setRating(Ratings ratings) {
-   	 
-   	 int shopidx = ratings.getShopidx();
-   	 int memberidx = ratings.getMemberidx();
-   	 
-   	 if(ratingsRepository.existingRatings(shopidx, memberidx) == true) {
-   		 ratingsRepository.updateRatings(ratings);
-   	 }
-   	 else {
-   		 ratingsRepository.setRatings(ratings);
-   	 }
-   	 
-   	 Map ratings_info = ratingsRepository.getSumCount(shopidx);    	 
-   	 
-   	 Double sum = (Double) ratings_info.get("sum");
-   	 Double count = ((Long)ratings_info.get("count")).doubleValue();
-   	 
-   	 double tol_rating = sum / count;
-   	 
-   	 shopRepository.setRatings(shopidx,tol_rating);
-   	 return true;
+       
+       int shopidx = ratings.getShopidx();
+       int memberidx = ratings.getMemberidx();
+       
+       if(ratingsRepository.existingRatings(shopidx, memberidx) == true) {
+          ratingsRepository.updateRatings(ratings);
+       }
+       else {
+          ratingsRepository.setRatings(ratings);
+       }
+       
+       Map ratings_info = ratingsRepository.getSumCount(shopidx);        
+       
+       log.info("ratings_info = {}", ratings_info);
+       log.info("ratings_info.get(\"sum\") = {}", ratings_info.get("sum").getClass());
+       
+       Double sum = (Double)ratings_info.get("sum");
+       log.info("sum = {}", sum);
+       Double count = ((Long)ratings_info.get("count")).doubleValue();
+       log.info("count = {}", count);
+       
+       
+       double tol_rating = sum / count;
+       
+       shopRepository.setRatings(shopidx,tol_rating);
+       return true;
     }
+    
+    /*
+     * 해당 아이템 별로 예약자 리스트 조회
+     */
+    public List<Map<String, Object>> getItemReservations(int itemidx){
+    	return shopRepository.getItemReservations(itemidx);
+    }    
 }

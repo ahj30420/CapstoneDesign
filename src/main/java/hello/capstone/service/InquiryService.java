@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import hello.capstone.dto.Inquiry;
 import hello.capstone.exception.InquiryException;
@@ -29,6 +31,13 @@ public class InquiryService {
 	 */
 	public List<Map<String, Object>> inquiryView(){
 		return inquiryRepository.inquiryView();
+	}
+	
+	/*
+	 * 1:1 문의 답변 보기(사용자 입장)
+	 */
+	public Inquiry inquiryAnswerView(int inquiryidx) {
+		return inquiryRepository.inquiryAnswerView(inquiryidx);
 	}
 	
 	/*

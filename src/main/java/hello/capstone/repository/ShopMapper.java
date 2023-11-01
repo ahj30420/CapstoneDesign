@@ -2,6 +2,7 @@ package hello.capstone.repository;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,6 +16,8 @@ public interface ShopMapper {
    Shop findByAddress(@Param("address") String address);  
    
    void saveShop(Shop shop);
+   
+   void shopDelete(int shopidx);
   
    int getShopIdx(Shop shop);
    
@@ -32,4 +35,6 @@ public interface ShopMapper {
    List<Shop> runRatingFilter(double rating);
    
    void setRatings(@Param("shopidx") int shopidx, @Param("rating") double rating);
+   
+   List<Map<String, Object>> getItemReservations(int itemidx);
 }

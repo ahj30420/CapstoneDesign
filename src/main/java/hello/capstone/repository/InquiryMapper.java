@@ -27,4 +27,6 @@ public interface InquiryMapper {
 	void inquiryAnswerDelete(@Param("inquiryidx") int inquiryidx, @Param("adminidx") int adminidx);
 	
 	void inquiryAnswerUpdate(@Param("inquiryidx") int inquiryidx, @Param("answer_redate") Date answer_redate, @Param("adminidx") int adminidx, @Param("content_answer") String content_answer);
+	
+	Inquiry inquiryAnswerView(int inquiryidx);
 }

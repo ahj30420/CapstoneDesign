@@ -175,7 +175,7 @@ public class ItemService {
 		String content = "[재고30]\n" + name + "님 정상적으로 예약이 완료되었습니다.\n\n" + "가게 이름: " + shopname + "\n상품명: " + itemname + "\n수량: " + number;
 		
 		itemRepository.reservation(reservation);
-		sendMessage(phone, content);
+		//sendMessage(phone, content);
 		
 	}
 	
@@ -198,14 +198,23 @@ public class ItemService {
 			itemRepository.reservationCancel(ridx, itemidx, number);
 		}
 		String content = "[재고30]\n" + name + "님 정상적으로 예약이 취소되었습니다.\n";
-		sendMessage(phone, content);
+		//sendMessage(phone, content);
 	}
 	
     /*
      * 예약 상품 리스트 조회
      */
-    public List<Map<String, Object>> getReservations(int memberidx){
-    	return itemRepository.getReservations(memberidx);
+    public List<Map<String, Object>> getReservations(int memberidx , String confirm){
+    	return itemRepository.getReservations(memberidx, confirm);
+    }
+    
+    /*
+     * 상품 예약 취소,거부 (상업자)
+     */
+    public void reservationCancelBusiness(int reservationIdx, Integer itemidx, Integer number, String name, String phone) {
+    	itemRepository.reservationCancelBusiness(reservationIdx,itemidx,number);
+    	String content = "[재고30]\n" + name + "님 상업자로부터 예약을 거절당하셨습니다.\n";
+    	//sendMessage(phone, content);
     }
 	
 	/*
@@ -213,11 +222,11 @@ public class ItemService {
 	 */
 	public SingleMessageSentResponse sendMessage(String phone, String content) {
 		
-		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCSRAEZQIIMYGVDM", "Z8VBFEFGTR9FIY47NF42GEK8UUKCKUKG", "https://api.coolsms.co.kr");
+		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCSNIDGJX633DVCZ", "O5QWFUPOJQ6TUOTT1XOKICBFC0YYU3B2", "https://api.coolsms.co.kr");
 		
 		Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
-        message.setFrom("01092592260");
+        message.setFrom("01087528309");
         message.setTo(phone);
         message.setText(content);
 

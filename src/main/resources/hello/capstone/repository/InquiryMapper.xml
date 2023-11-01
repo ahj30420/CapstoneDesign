@@ -49,4 +49,8 @@
 		where where inquiryidx = #{inquiryidx};
 	</update>
 	
+	<select id = "inquiryAnswerView">
+		select * from inquiry
+		where inquiryidx = #{inquiryidx};
+	</select>
 </mapper>

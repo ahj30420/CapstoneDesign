@@ -1,4 +1,4 @@
-package hello.capstone.controller;
+ package hello.capstone.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -135,19 +135,23 @@ public class ItemController {
     * 상품 예약
     */
    @PostMapping("/reservation")
-   public String reservation(@RequestParam("shopidx") String si,
+   public String reservation(HttpSession session, @RequestParam("shopidx") String si,
 		   					 @RequestParam("memberidx") String mi,
 		   					 @RequestParam("itemidx") String ii,
 		   					 @RequestParam("number") String num,
 		   					 @RequestParam("shopname") String shopname,
-		   					 @RequestParam("itemname") String itemname,
-		   					 @RequestParam("name") String name,
-		   					 @RequestParam("phone") String phone) {
+		   					 @RequestParam("itemname") String itemname) {
 	   
 	   int memberidx = Integer.parseInt(mi);
 	   int shopidx = Integer.parseInt(si);
 	   int itemidx = Integer.parseInt(ii);
 	   int number = Integer.parseInt(num);
+	   
+	   log.info("itemidx={}", itemidx);
+	   
+	   Member member = (Member) session.getAttribute("member");
+	   String name = member.getName(); 
+	   String phone = member.getPhone();
 	   
 	   Reservation reservation = new Reservation(0,memberidx,shopidx,itemidx,number,null,"wait");
 	   
@@ -156,20 +160,16 @@ public class ItemController {
    }
    
    /*
-    *  상품 예약 확인(상업자가 확인 버튼 클릭)
+    * 상품 예약 확인(상업자가 확인 버튼 클릭)
     */
    @PostMapping("/reservation/confirm")
-   public String confirm(@RequestParam("reservationidx") String ridx) {
-	   
+   public void reservationComplete(@RequestParam("reservationidx") String ridx) {
 	   int reservationidx = Integer.parseInt(ridx);
-	   
 	   itemService.reservationConfirm(reservationidx);
-	   
-	   return "";
    }
    
    /*
-    * 상품 예약 취소
+    * 사용자 입장에서 상품 예약 취소
     */
    @PostMapping("/reservation/cancel")
    public String cancel(HttpSession session, @RequestBody List<Map<String, Object>> reservationinfo) {
@@ -192,13 +192,32 @@ public class ItemController {
    }
    
    /*
-    * 예약 상품 리스트 조회
+    * 예약 상품 리스트 조회(사용자) (대기중인 예약, 완료된 예약 따로)
     */
    @GetMapping("/reservation/getreservations")
-   public List<Map<String, Object>> getReservations(HttpSession session){
+   public List<Map<String, Object>> getReservations(@RequestParam("confirm") String confirm,HttpSession session){
+	   log.info("confirm={}",confirm);
 	   Member member = (Member) session.getAttribute("member");
-	   return itemService.getReservations(member.getMemberIdx());
+	   return itemService.getReservations(member.getMemberIdx(), confirm);
    }
+   
+   /*
+    * 상품 예약 취소(상업자)
+    */
+   @DeleteMapping("/reservation/cancel/business")
+   public void reservationCancelBusiness(HttpSession session,
+		    							 @RequestParam("reservationIdx") Integer reservationIdx,
+		   								 @RequestParam("itemidx") Integer itemidx,
+		   								 @RequestParam("number") Integer number
+		   								 ) {
+	   Member member = (Member) session.getAttribute("member");
+	   
+	   String name = member.getName();
+	   String phone = member.getPhone();
+	   
+	   itemService.reservationCancelBusiness(reservationIdx,itemidx,number, name, phone);
+   }
+   
    
    /*
     * String을 Timestamp로 변환하는 함수

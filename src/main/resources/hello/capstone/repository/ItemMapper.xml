@@ -90,12 +90,19 @@
 	</delete>
 	
 	<select id="getReservations" resultType="map">
-		SELECT r.reservationidx, s.shopname, s.shopaddress, i.itemidx, i.itemname, i.image, r.number
+		SELECT r.reservationidx, s.shopidx, s.shopname, s.shopaddress, i.itemidx, i.itemname, i.image, r.number
 		FROM reservation r
 		JOIN shop s ON r.shopidx = s.shopidx
 		JOIN item i ON r.itemidx = i.itemidx
-		WHERE r.memberidx = #{memberidx} and r.confirm = "wait";
+		WHERE r.memberidx = #{memberidx} and r.confirm = #{confirm};
 	</select>
+	
+	
+	<delete id ="reservationCancelBusiness">
+		delete
+		from reservation
+		where reservationidx = #{reservationIdx};
+	</delete>
 	
 	<update id = "increaseQuantity">
 		update item set quantity = quantity + #{number}

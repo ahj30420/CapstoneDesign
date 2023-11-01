@@ -4,7 +4,7 @@
 <mapper namespace="hello.capstone.repository.LoginMapper">
    
    <insert id = "save">
-      insert into member(id, pw, name, nickname,phone, social,  role, redate) values(#{id}, #{pw}, #{name}, #{nickname},#{phone}, #{social}, #{role}, #{redate})
+      insert into member(id, pw, name, nickname, phone, social,  role, redate) values(#{id}, #{pw}, #{name}, #{nickname},#{phone}, #{social}, #{role}, #{redate})
    </insert>
    
    <insert id = "saveSocial">

@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hello.capstone.dto.Inquiry;
+import hello.capstone.dto.Member;
 import hello.capstone.service.InquiryService;
 import hello.capstone.service.ItemService;
 import hello.capstone.service.ShopService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,19 +35,28 @@ public class InquiryController {
 	@GetMapping("/view")
 	public List<Map<String, Object>> inquiryView(){
 		return inquiryService.inquiryView();
-		
+	}
+	
+	/*
+	 * 1:1 문의 답변 보기(사용자 입장)
+	 */
+	@GetMapping("/user/answer/view")
+	public Inquiry inquiryAnswerView(@RequestParam("inquiryidx") int inquiryidx) {
+		return inquiryService.inquiryAnswerView(inquiryidx);
 	}
 	
 	/*
 	 * 1:1문의 등록
 	 */
 	@PostMapping("/register")
-	public String inquiryRegister(@RequestParam("useridx") String uidx,
+	public String inquiryRegister(HttpSession session,
 								  @RequestParam("content_inquiry") String content_inquiry) {
 		
 		Inquiry inquiry = new Inquiry();
 		
-		int useridx = Integer.parseInt(uidx);
+		Member member = (Member)session.getAttribute("member");
+		
+		int useridx = member.getMemberIdx();
 		long miliseconds = System.currentTimeMillis();
 		Date redate = new Date(miliseconds);
 		

@@ -1,7 +1,13 @@
 package hello.capstone.exception.exception_manager;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,6 +24,9 @@ import hello.capstone.exception.SendMessageException;
 //import hello.capstone.exception.SendMessageException;
 import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.TimeSettingException;
+import hello.capstone.exception.ValidationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.CodeVerificationException;
 import hello.capstone.exception.ExistReservationException;
@@ -32,124 +41,129 @@ import hello.capstone.exception.InvalidPhoneNumberException;
 @RestControllerAdvice
 public class ExceptionManager {
 
-	// (1) 모든 RuntimeException 에러가 발생시 동작
+	//모든 RuntimeException 에러가 발생시 동작
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e){   // ? 는 모든 값이 올 수 있다는 것
 	    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)      // 서버 에러 상태 메시지와 body에 에러상태 메시지(문자열)을 넣어 반환해줌
 	            .body(Response.error(e.getMessage(), null));
 	}
 	
-	// (2) 기존에 만들어둔 에러(SignUpException)가 발생시 동작
+	//기존에 만들어둔 에러(SignUpException)가 발생시 동작
 	@ExceptionHandler(SignUpException.class)
 	public ResponseEntity<?> SignUpExceptionHandler(SignUpException e){
 	    return ResponseEntity.status(e.getErrorCode().getStatus())
 	            .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
  
-	//(3) 기존에 만들어둔 에러(LogInException)가 발생시 동작
+	//기존에 만들어둔 에러(LogInException)가 발생시 동작
 	@ExceptionHandler(LogInException.class)
 	public ResponseEntity<?> LogInExceptionHandler(LogInException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
 	
-	//(4) 기존에 만들어둔 에러(SaveShopException)가 발생시 동작
+	//기존에 만들어둔 에러(SaveShopException)가 발생시 동작
 	@ExceptionHandler(SaveShopException.class)
 	public ResponseEntity<?> SaveShopExceptionHandler(SaveShopException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
 	
-	//(5) 기존에 만들어둔 에러(AlreadyBookmarkedShopException)가 발생시 동작
+	//기존에 만들어둔 에러(AlreadyBookmarkedShopException)가 발생시 동작
 	@ExceptionHandler(AlreadyBookmarkedShopException.class)
 	public ResponseEntity<?> AlreadyBookmarkedShopExceptionHandler(AlreadyBookmarkedShopException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
 	
-	//(6) 기존에 만들어둔 에러(NicknameException)가 발생시 동작
+	//기존에 만들어둔 에러(NicknameException)가 발생시 동작
 	@ExceptionHandler(NicknameException.class)
 	public ResponseEntity<?> NicknameExceptionHandler(NicknameException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(7) 기존에 만들어둔 에러(FindPwException)가 발생시 동작
+	//기존에 만들어둔 에러(FindPwException)가 발생시 동작
 	@ExceptionHandler(FindPwException.class)
 	public ResponseEntity<?> FindPwExceptionHandler(FindPwException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
 		
-	//(8) 기존에 만들어둔 에러(SendMessageException)가 발생시 동작
+	//기존에 만들어둔 에러(SendMessageException)가 발생시 동작
 	@ExceptionHandler(SendMessageException.class)
 	public ResponseEntity<?> SendMessageExceptionHandler(SendMessageException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(9) 기존에 만들어둔 에러(CodeVerificationException)가 발생시 동작
+	//기존에 만들어둔 에러(CodeVerificationException)가 발생시 동작
 	@ExceptionHandler(CodeVerificationException.class)
 	public ResponseEntity<?> CodeVerificationExceptionHandler(CodeVerificationException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(10) 기존에 만들어둔 에러(SaveItemException)가 발생시 동작
+	//기존에 만들어둔 에러(SaveItemException)가 발생시 동작
 	@ExceptionHandler(SaveItemException.class)
 	public ResponseEntity<?> SaveItemExceptionHandler(SaveItemException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(11) 기존에 만들어둔 에러(TimeSettingException)가 발생시 동작
+	//기존에 만들어둔 에러(TimeSettingException)가 발생시 동작
 	@ExceptionHandler(TimeSettingException.class)
 	public ResponseEntity<?> TimeSettingExceptionHandler(TimeSettingException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(12) 기존에 만들어둔 에러(TimeSettingException)가 발생시 동작
+	//기존에 만들어둔 에러(InvalidPhoneNumberException)가 발생시 동작
 	@ExceptionHandler(InvalidPhoneNumberException.class)
 	public ResponseEntity<?> InvalidPhoneNumberExceptionHandler(InvalidPhoneNumberException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
 	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
 	}
-	//(13) 기존에 만들어둔 에러(TimeSettingException)가 발생시 동작
+	//기존에 만들어둔 에러(InvalidEmailException)가 발생시 동작
 	@ExceptionHandler(InvalidEmailException.class)
 	public ResponseEntity<?> InvalidEmailExceptionHandler(InvalidEmailException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
 	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
-	}	
-	//(14) 기존에 만들어둔 에러(QuantityException)가 발생시 동작
+	}
+	//기존에 만들어둔 에러(QuantityException)가 발생시 동작
 	@ExceptionHandler(QuantityException.class)
 	public ResponseEntity<?> InvalidEmailExceptionHandler(QuantityException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}	
-	//(15) 기존에 만들어둔 에러(InquiryException)가 발생시 동작
+	//기존에 만들어둔 에러(InquiryException)가 발생시 동작
 	@ExceptionHandler(InquiryException.class)
 	public ResponseEntity<?> InquiryExceptionHandler(InquiryException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(16) 기존에 만들어둔 에러(NullTitleException)가 발생시 동작
+	//기존에 만들어둔 에러(NullTitleException)가 발생시 동작
 	@ExceptionHandler(NullTitleException.class)
 	public ResponseEntity<?> NullTitleExceptionHandler(NullTitleException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(17) 기존에 만들어둔 에러(NullContentException)가 발생시 동작
+	//기존에 만들어둔 에러(NullContentException)가 발생시 동작
 	@ExceptionHandler(NullContentException.class)
 	public ResponseEntity<?> NullContentExceptionHandler(NullContentException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(18) 기존에 만들어둔 에러(NullPhoneException)가 발생시 동작
+	//기존에 만들어둔 에러(NullPhoneException)가 발생시 동작
 	@ExceptionHandler(NullPhoneException.class)
 	public ResponseEntity<?> NullPhoneExceptionHandler(NullPhoneException e){
 	   return ResponseEntity.status(e.getErrorCode().getStatus())
-	           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
 	}
-	//(19) 기존에 만들어둔 에러(ExistReservationException)가 발생시 동작
-		@ExceptionHandler(ExistReservationException.class)
-		public ResponseEntity<?> ExistReservationExceptionHandler(ExistReservationException e){
-		   return ResponseEntity.status(e.getErrorCode().getStatus())
-		           .body(Response.error(e.getErrorCode().getMessage(),e.getErrorCode().getMessage()));
-		}
+	//기존에 만들어둔 에러(ExistReservationException)가 발생시 동작
+	@ExceptionHandler(ExistReservationException.class)
+	public ResponseEntity<?> ExistReservationExceptionHandler(ExistReservationException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
+	}
+	//기존에 만들어둔 에러(ValidationException)가 발생시 동작
+	@ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getErrors());
+    }
 }

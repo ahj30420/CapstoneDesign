@@ -15,7 +15,7 @@
 	</delete>
 	
 	
-	<select id ="getMyBookmarkedShop" resultType ="hashmap">
+	<select id ="getMyBookmarkedShop" resultType ="shop">
 		SELECT s.*
 		FROM bookmarks b
 		JOIN shop s ON b.shopidx = s.shopidx

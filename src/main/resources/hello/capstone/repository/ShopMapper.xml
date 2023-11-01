@@ -12,6 +12,11 @@
       insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate, longitude, latitude) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, #{registrationDate}, #{longitude}, #{latitude});
 	</insert>
 	
+	<delete id = "shopDelete">
+		delete from shop 
+		where shopidx = #{shopidx};
+	</delete>
+	
 	<select id="getShopIdx">
 		select shopidx from shop where shopname = #{shopName} and shopaddress = #{shopAddress};
 	</select>
@@ -58,4 +63,13 @@
 		update shop set rating = #{rating}
 		where shopidx = #{shopidx};
 	</update>
-</mapper>
+	
+	<select id = "getItemReservations">
+		select r.reservationidx, m.memberidx, m.name, m.phone, m.trust, r.number, r.confirm, r.itemidx 
+		from member as m 
+		left join reservation as r
+		on m.memberidx = r.memberidx
+		where r.itemidx = #{itemidx};
+	</select>
+	
+</mapper> 
