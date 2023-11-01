@@ -1,6 +1,7 @@
 package hello.capstone.service;
 
-import java.sql.Date;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.ibatis.annotations.Delete;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -48,33 +47,62 @@ public class ShopService {
 	String kakaoLocalKey;
 	String uri = "https://dapi.kakao.com/v2/local/search/address.json";
 	
-	public boolean saveShop(Shop shop, String method) {
-		
-		log.info("saveShop Start");
-		
-		if(method.equals("register")) {
-			//.ifPresent()는 memberRepository.findById 실행 시 오류 던져주기 위함
-			Optional.ofNullable(shopRepository.findByAddress(shop.getShopAddress()))
-				.ifPresent(user->{
-					throw new SaveShopException(ErrorCode.DUPLICATED_SHOP,null);
-				});
-			
-			long miliseconds = System.currentTimeMillis();
-			Date registrationDate = new Date(miliseconds);
-			shop.setRegistrationDate(registrationDate);
-		}
+	@Value("${file.dir}")
+	private String fileDir;
+	
+	/*
+	 * 가게등록
+	 */
+	public void saveShop(Shop shop) throws IllegalStateException, IOException {
+		//해당 주소에 가게가 이미 존재하는지 판단
+		Optional.ofNullable(shopRepository.findByAddress(shop.getShopAddress()))
+			.ifPresent(user->{
+				throw new SaveShopException(ErrorCode.DUPLICATED_SHOP,null);
+			});
 
-		log.info("saveShop Middle");
+		//파일 이름 추출
+		MultipartFile imageFile = shop.getImageFile();
+		
+		if(imageFile != null) {
+			String fullPath = fileDir + imageFile.getOriginalFilename();
+			log.info("파일 저장 fullPath ={}",fullPath);
+			imageFile.transferTo(new File(fullPath));
+			shop.setImageFilename(imageFile.getOriginalFilename());
+		}
 		
 		//주소로 경도, 위도 뽑아서 shop에 저장
-		String shop_address = shop.getShopAddress();
-		Coordinates cor = getCoordinate(shop_address);
+		String shopAddress = shop.getShopAddress();
+		Coordinates cor = getCoordinate(shopAddress);
 		shop.setLongitude(cor.getX());
 		shop.setLatitude(cor.getY());
 		
-		log.info("shop info = {}", shop);
 		
-		return shopRepository.saveShop(shop,method);
+		shopRepository.saveShop(shop);
+	}
+		
+	
+	/*
+	 * 가게 수정
+	 */
+	public void updateShop(Shop shop, MultipartFile image, String address) throws IllegalStateException, IOException {
+		
+		//이미지 파일이 새로 바뀐 경우
+		if(image != null) {
+			String fullPath = fileDir + image.getOriginalFilename();
+			log.info("파일 저장 fullPath ={}",fullPath);
+			image.transferTo(new File(fullPath));
+			shop.setImageFilename(image.getOriginalFilename());
+		}
+		
+		//주소가 새로 바뀐 경우 / 위도, 경도까지 새로 적용
+		if(!(address.equals(""))) {
+			shop.setShopAddress(address);
+			
+			Coordinates cor = getCoordinate(address);
+			shop.setLongitude(cor.getX());
+			shop.setLatitude(cor.getY());
+		}
+		shopRepository.updateShop(shop);
 	}
 	
 	public void shopDelete(int shopidx) {

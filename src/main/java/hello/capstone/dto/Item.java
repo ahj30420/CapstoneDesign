@@ -1,6 +1,9 @@
 package hello.capstone.dto;
 
 import java.sql.Timestamp;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,6 +19,7 @@ public class Item {
 	private int salecost;
 	private int quantity;
 	private String itemnotice;
+	private MultipartFile imageFile;
 	private String image;
 	private String category;
 	private Timestamp  starttime;

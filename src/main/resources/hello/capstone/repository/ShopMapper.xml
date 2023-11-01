@@ -9,7 +9,7 @@
 	</select>
 	
 	<insert id="saveShop">
-      insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate, longitude, latitude) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, #{registrationDate}, #{longitude}, #{latitude});
+      insert into shop(shopname, shopaddress, owneridx	,shoptel, shopwebsite, imagefilename, promotionText, registrationDate, longitude, latitude) values( #{shopName}, #{shopAddress}, #{ownerIdx},#{shopTel}, #{shopWebsite}, #{imageFilename}, #{promotionText}, DATE(NOW()), #{longitude}, #{latitude});
 	</insert>
 	
 	<delete id = "shopDelete">
@@ -39,9 +39,8 @@
 	</select>
 	
 	<update id="modifyShop">
-		update shop set shopname = #{shopName}, shopaddress = #{shopAddress}, owneridx = #{ownerIdx}, shoptel = #{shopTel}, shopwebsite = #{shopWebsite}, imagefilename = #{imageFilename}, promotionText = #{promotionText}, longitude = #{longitude}, latitude = #{latitude}
-		where shopidx = #{shopidx}
-		 
+		update shop set shopname = #{shopName}, shopaddress = #{shopAddress}, owneridx = #{ownerIdx}, shoptel = #{shopTel}, shopwebsite = #{shopWebsite}, imagefilename = #{imageFilename}, promotionText = #{promotionText} , latitude = #{latitude}, longitude = #{longitude}
+		where shopidx = #{shopidx}		 
 	</update>
 	
 	<select id = "runPriceFilter" resultType = "Shop">

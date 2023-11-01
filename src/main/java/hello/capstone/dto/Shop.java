@@ -5,6 +5,8 @@ package hello.capstone.dto;
 import java.sql.Date;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,6 +18,7 @@ public class Shop {
 	private String shopName;
 	private int ownerIdx;
 	private String imageFilename;
+	private MultipartFile imageFile;
 	private String shopAddress;
 	private String shopTel;
 	private String shopWebsite;

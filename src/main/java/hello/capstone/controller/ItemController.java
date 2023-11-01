@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,67 +48,72 @@ public class ItemController {
    private String fileDir;
    
    /*
-    * 아이템 등록
+    * item 등록
     */
-   @PostMapping("/register")
-   public Item ItemRegistration(@RequestParam(value = "image", required = false) MultipartFile Image,
-           				   @RequestParam(value = "itemidx", defaultValue = "0") String iidx,
-                           @RequestParam("shopidx") String sid,
-                           @RequestParam("itemName") String itemname,
-                           @RequestParam("cost") String ct,
-                           @RequestParam("salecost") String sct,
-                           @RequestParam("quantity") String qt,
-                           @RequestParam("category") String category,
-                           @RequestParam("itemnotice") String itemnotice,
-                           @RequestParam("endtime") String et,
-                           @RequestParam("starttime") String st,
-                           @RequestParam(value = "existingImage", required = false) String existingImage,
-                           @RequestParam(value = "method", defaultValue = "register") String method,
-                           HttpSession session
-                           ) throws IllegalStateException, IOException, ParseException {
-      
-      log.info("shopidx = {}", sid);
-      
-      int itemidx = Integer.parseInt(iidx);
-      int shopidx = Integer.parseInt(sid);
-      int cost = Integer.parseInt(ct);
-      int salecost = Integer.parseInt(sct);
-      int quantity = Integer.parseInt(qt);
-      
-      Item item = new Item();
-      item.setItemidx(itemidx);
-      item.setShopidx(shopidx);
-      item.setItemname(itemname);
-      item.setItemnotice(itemnotice);
-      item.setCost(cost);
-      item.setSalecost(salecost);
-      item.setQuantity(quantity);
-      item.setCategory(category);
-      
-      log.info("starttime = {}", st);
-      Timestamp starttime = convertStringToTimestamp(st);
-      log.info("convertStringToTimestamp = {}", starttime);
-      Timestamp endtime = convertStringToTimestamp(et);
-      
-      item.setStarttime(starttime);
-      item.setEndtime(endtime);
-      log.info("image = {} ",Image);
-      if(Image != null) {
-         String fullPath = fileDir + Image.getOriginalFilename();
-         Image.transferTo(new File(fullPath));
-         log.info("fullPath = {}", fullPath);
-         item.setImage(Image.getOriginalFilename());
-      }
-      else {
-    	  item.setImage(existingImage);
-      }
-      
-      log.info("item = {}", item);
-      log.info("method = {}", method);
-      
-      itemService.itemsave(item, method);
-        
-      return item;
+   @PostMapping("/create")
+   public void itemCreate(@RequestParam("imageFile") MultipartFile imageFile,
+			              @RequestParam("shopidx") int shopIdx,
+			              @RequestParam("itemName") String itemName,
+			              @RequestParam("cost") int cost,
+			              @RequestParam("salecost") int saleCost,
+			              @RequestParam("quantity") int quantity,
+			              @RequestParam("category") String category,
+			              @RequestParam("itemnotice") String itemNotice,
+			              @RequestParam("endtime") String endParam,
+			              @RequestParam("starttime") String startParam) 
+			            		  throws IllegalStateException, IOException, ParseException{
+	   
+	   Item item = new Item();
+	   
+	   item.setShopidx(shopIdx);
+	   item.setItemname(itemName);
+	   item.setImageFile(imageFile);
+	   item.setCost(cost);
+	   item.setQuantity(quantity);
+	   item.setCategory(category);
+	   item.setItemnotice(itemNotice);
+	   item.setSalecost(saleCost);
+	   item.setStarttime(convertStringToTimestamp(startParam));
+	   item.setEndtime(convertStringToTimestamp(endParam));
+	   
+	   itemService.saveItem(item);
+   }
+   
+   
+   /*
+    * 아이템 수정
+    */
+   @PutMapping("/update")
+   public void itemUpdate(@RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+			              @RequestParam("itemidx") int itemIdx,
+			              @RequestParam("itemName") String itemName,
+			              @RequestParam("cost") int cost,
+			              @RequestParam("salecost") int saleCost,
+			              @RequestParam("quantity") int quantity,
+			              @RequestParam("category") String category,
+			              @RequestParam("itemnotice") String itemNotice,
+			              @RequestParam(value = "endtime", required = false) String endParam,
+			              @RequestParam(value = "starttime", required = false) String startParam) 
+			            		  throws ParseException, IllegalStateException, IOException {
+	   
+	   Item oldItem = itemService.findByItemIdx(itemIdx);
+
+	   oldItem.setItemname(itemName);
+	   oldItem.setCost(cost);
+	   oldItem.setSalecost(saleCost);
+	   oldItem.setQuantity(quantity);
+	   oldItem.setCategory(category);
+	   oldItem.setItemnotice(itemNotice);
+	   log.info("endparam = {}", endParam);
+	   if(endParam != null || endParam =="" ) {
+		   oldItem.setEndtime(convertStringToTimestamp(endParam));
+	   }
+	   if(startParam != null || startParam =="" ) {
+		   oldItem.setStarttime(convertStringToTimestamp(startParam));
+	   }
+	   
+	   
+	   itemService.updateItem(oldItem, imageFile);
    }
    
    /*
@@ -223,10 +229,21 @@ public class ItemController {
     * String을 Timestamp로 변환하는 함수
     */
    private Timestamp convertStringToTimestamp(String dateString) throws ParseException {
-	   SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+     
+	   try {
+		   SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+		   Date parsedDate = inputDateFormat.parse(dateString);
+		   Timestamp parseTime = new Timestamp(parsedDate.getTime());
+		   //타임존 반영을 위해 9시간 +
+		   Timestamp Time = new Timestamp(parseTime.getTime() + (9 * 60 * 60 * 1000));
+		   
+		   return Time;
        
-	   Date parsedDate = inputDateFormat.parse(dateString);
-	   
-       return new Timestamp(parsedDate.getTime());
+       } catch(ParseException e) {
+    	   SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    	   Date parsedDate = inputDateFormat.parse(dateString);
+    	   return new Timestamp(parsedDate.getTime());
+       }
+	       
    }
 }

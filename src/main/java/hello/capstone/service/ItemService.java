@@ -2,21 +2,25 @@ package hello.capstone.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
-import hello.capstone.dto.Alarm;
+import hello.capstone.dto.Coordinates;
 import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Reservation;
@@ -25,12 +29,10 @@ import hello.capstone.exception.ExistReservationException;
 import hello.capstone.exception.NullPhoneException;
 import hello.capstone.exception.QuantityException;
 import hello.capstone.exception.SaveItemException;
-import hello.capstone.exception.SaveShopException;
 import hello.capstone.exception.TimeSettingException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.repository.ItemRepository;
 import hello.capstone.repository.MemberRepository;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
@@ -38,6 +40,7 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,38 +50,62 @@ public class ItemService {
 	private final ItemRepository itemRepository;
 	private final MemberRepository memberRepository;
 	
+   @Value("${itemfile.dir}")
+   private String fileDir;
+	
 	/*
-	 * 아이템 등록
+	 * 아이템 저장
 	 */
-	public boolean itemsave(Item item, String method) {
+	public void saveItem(Item item) 
+			throws IllegalStateException, IOException{
 		
-		if(method.equals("register")) {
-			Optional.ofNullable(itemRepository.findByShopIdx_itemname(item.getShopidx(), item.getItemname()))
-				.ifPresent(user->{
-					throw new SaveItemException(ErrorCode.DUPLICATED_ITEM,null);
-				});
-		}
+		//이미지 파일 이름 저장
+		if(item.getImageFile() != null) {
+	         String fullPath = fileDir + item.getImageFile().getOriginalFilename();
+	         item.getImageFile().transferTo(new File(fullPath));
+	         item.setImage(item.getImageFile().getOriginalFilename());
+	      }
 		
+		//중복아이템 검사
+		Optional.ofNullable(itemRepository.findByShopIdxAndItemname(item.getShopidx(), item.getItemname()))
+		.ifPresent(user->{
+			throw new SaveItemException(ErrorCode.DUPLICATED_ITEM,null);
+		});
 		
-		//MySql의 Timestamp는 타임존을 반영하기 때문에 9시간 전으로 저장이 됨. 그걸 맞추기위해 9시간을 더해줌
-		Timestamp startTimeForSeoul = new Timestamp(item.getStarttime().getTime() + (9 * 60 * 60 * 1000));
-		Timestamp endTimeForSeoul = new Timestamp(item.getEndtime().getTime() + (9 * 60 * 60 * 1000));
-		item.setStarttime(startTimeForSeoul);
-		item.setEndtime(endTimeForSeoul);
-		
-		int timeOut = startTimeForSeoul.compareTo(endTimeForSeoul);
+		//시작시간보다 마감시간이 빠른지 검사
+		int timeOut = item.getStarttime().compareTo(item.getEndtime());
 		if(timeOut >= 0) {
 			throw new TimeSettingException(ErrorCode.TIME_SETTING_ERROR,null);
 		}
 		
-		log.info("service_item = {}", item);
-		
-		itemRepository.saveitem(item, method);
+		itemRepository.saveItem(item);
 		
 		itemRepository.pushAlarm(item.getShopidx());
-		log.info("shopidx = {}", item.getShopidx());
 		
-		return true;
+	}
+	
+	/*
+	 * 아이템 수정
+	 */
+	public void updateItem(Item item, MultipartFile imageFile) 
+			throws IllegalStateException, IOException {
+		
+		//이미지 파일이 새로 바뀐 경우
+		if(imageFile != null) {
+			String fullPath = fileDir + imageFile.getOriginalFilename();
+			log.info("파일 저장 fullPath ={}",fullPath);
+			imageFile.transferTo(new File(fullPath));
+			item.setImage(imageFile.getOriginalFilename());
+		}
+		log.info("Item = {}", item);
+		
+		//시작시간보다 마감시간이 빠른지 검사
+		int timeOut = item.getStarttime().compareTo(item.getEndtime());
+		if(timeOut >= 0) {
+			throw new TimeSettingException(ErrorCode.TIME_SETTING_ERROR,null);
+		}
+		
+		itemRepository.updateItem(item);
 	}
 	
 	/*
@@ -104,6 +131,12 @@ public class ItemService {
 		itemRepository.itemDelete(item);
 		
 		
+	}
+	/*
+	 * 인덱스로 아이템찾기
+	 */
+	public Item findByItemIdx(int itemIdx) {
+		return itemRepository.findByItemIdx(itemIdx);
 	}
 	
 	/*

@@ -29,15 +29,16 @@ public class ShopRepository {
 	/*
 	 * 매장 등록
 	 */
-	public boolean saveShop(Shop shop, String method) {
-		if(method.equals("register")) {
-			shopMapper.saveShop(shop);
-		}
-		else {
-			shopMapper.modifyShop(shop);
-		}
-		log.info("repository shop = {}", shop);
-		return true;
+	public void saveShop(Shop shop) {
+		shopMapper.saveShop(shop);
+	}
+	
+	
+	/*
+	 * 매장 수정
+	 */
+	public void updateShop(Shop shop) {
+		shopMapper.modifyShop(shop);
 	}
 	
 	public void shopDelete(int shopidx) {

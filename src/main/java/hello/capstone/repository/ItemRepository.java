@@ -28,23 +28,31 @@ public class ItemRepository {
 	/*
 	 * 상품 등록
 	 */
-	public boolean saveitem(Item item, String method) {
-		if(method.equals("register")) {
-			log.info("repository_item = {}", item);
-			itemMapper.saveitem(item);
-		}
-		else {
-			itemMapper.modifyItem(item);
-		}
-		return true;
+	public void saveItem(Item item) {
+		itemMapper.saveItem(item);
+		
+	}
+	
+	/*
+	 * 상품 수정
+	 */
+	public void updateItem(Item item) {
+		itemMapper.updateItem(item);
+	}
+	
+	/*
+	 * 인덱스로 아이템 가져오기
+	 */
+	public Item findByItemIdx(int itemIdx) {
+		return itemMapper.findByItemIdx(itemIdx);
 	}
 	
 	
 	/*
 	 * 상품 등록시 가게 고유 번호와 상품 이름으로 상품 중복 확인
 	 */
-	public Item findByShopIdx_itemname(int shopidx, String itemname) {
-		return itemMapper.findByShopIdx_itemname(shopidx, itemname);
+	public Item findByShopIdxAndItemname(int shopidx, String itemname) {
+		return itemMapper.findByShopIdxAndItemname(shopidx, itemname);
 	}
 	
 	
