@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +41,7 @@ public class MemberController {
 	private final MemberService memberService;
 	private final ShopService shopService;
 	private final ItemService itemService;
+	private final PasswordEncoder bCryptPasswordEncoder;
 	
 	
 	/*
@@ -116,9 +118,12 @@ public class MemberController {
 		String oldPw = pwMap.get("oldpw");
 		String newPw = pwMap.get("newpw");
 		Member member = (Member)session.getAttribute("member");
-		memberService.pwCheck(member, oldPw);
+		memberService.pwCheck(member.getId(), oldPw);
 		
-		Member newMember = memberService.updatePwOnPurpose(member, newPw);
+		String pw = bCryptPasswordEncoder.encode(newPw);
+		
+		Member newMember = memberService.updatePwOnPurpose(member, pw);
+		newMember.maskSensitiveInformation();
 		session.setAttribute("member", newMember);
 		
 		return "/";
@@ -155,7 +160,7 @@ public class MemberController {
 	public String deleteMember(HttpSession session, String pw) {
 		
 		Member member = (Member) session.getAttribute("member");
-		memberService.pwCheck(member, pw);
+		memberService.pwCheck(member.getId(), pw);
 		memberService.deleteMember(member);
 		
 		session.removeAttribute("member");

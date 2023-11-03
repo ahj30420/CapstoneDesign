@@ -20,8 +20,8 @@ public class InquiryRepository {
 	/*
 	 * 1:1문의 나열
 	 */
-	public List<Map<String, Object>> inquiryView(){
-		return inquiryMapper.inquiryView();
+	public List<Map<String, Object>> inquiryView(int memberidx){
+		return inquiryMapper.inquiryView(memberidx);
 	}
 	
 	/*

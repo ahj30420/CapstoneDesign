@@ -82,28 +82,35 @@ public class ShopService {
 		
 	
 	/*
-	 * 가게 수정
-	 */
-	public void updateShop(Shop shop, MultipartFile image, String address) throws IllegalStateException, IOException {
-		
-		//이미지 파일이 새로 바뀐 경우
-		if(image != null) {
-			String fullPath = fileDir + image.getOriginalFilename();
-			log.info("파일 저장 fullPath ={}",fullPath);
-			image.transferTo(new File(fullPath));
-			shop.setImageFilename(image.getOriginalFilename());
-		}
-		
-		//주소가 새로 바뀐 경우 / 위도, 경도까지 새로 적용
-		if(!(address.equals(""))) {
-			shop.setShopAddress(address);
-			
-			Coordinates cor = getCoordinate(address);
-			shop.setLongitude(cor.getX());
-			shop.setLatitude(cor.getY());
-		}
-		shopRepository.updateShop(shop);
-	}
+    * 가게 수정
+    */
+   public void updateShop(Shop shop, MultipartFile image, String address) throws IllegalStateException, IOException {
+      
+      Shop oldShop = shopRepository.getShopByIdx(shop.getShopidx());
+      oldShop.setShopName(shop.getShopName());
+      oldShop.setShopTel(shop.getShopTel());
+      oldShop.setPromotionText(shop.getPromotionText());
+      oldShop.setShopWebsite(shop.getShopWebsite());
+      
+      //이미지 파일이 새로 바뀐 경우
+      if(image != null) {
+         String fullPath = fileDir + image.getOriginalFilename();
+         log.info("파일 저장 fullPath ={}",fullPath);
+         image.transferTo(new File(fullPath));
+         oldShop.setImageFilename(image.getOriginalFilename());
+      }
+      
+      //주소가 새로 바뀐 경우 / 위도, 경도까지 새로 적용
+      if(!(address.equals("")) ) {
+         oldShop.setShopAddress(address);
+         
+         Coordinates cor = getCoordinate(address);
+         oldShop.setLongitude(cor.getX());
+         oldShop.setLatitude(cor.getY());
+      }
+      
+      shopRepository.updateShop(oldShop);
+   }
 	
 	public void shopDelete(int shopidx) {
 		shopRepository.shopDelete(shopidx);

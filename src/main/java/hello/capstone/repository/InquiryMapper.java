@@ -12,7 +12,7 @@ import hello.capstone.dto.Inquiry;
 @Mapper
 public interface InquiryMapper {
 	
-	List<Map<String, Object>> inquiryView();
+	List<Map<String, Object>> inquiryView(int memberidx);
 
 	void register(Inquiry inquiry);
 	

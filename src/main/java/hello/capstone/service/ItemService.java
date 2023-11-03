@@ -116,6 +116,14 @@ public class ItemService {
 		List<Item> items = new ArrayList<Item>();
 		items = itemRepository.getItems(shopIdx);
 		
+		for(int i = 0; i < items.size(); i++) {
+			Timestamp starttime = new Timestamp(items.get(i).getStarttime().getTime() - (9 * 60 * 60 * 1000));
+			Timestamp endtime = new Timestamp(items.get(i).getEndtime().getTime() - (9 * 60 * 60 * 1000));
+			
+			items.get(i).setStarttime(starttime);
+			items.get(i).setEndtime(endtime);
+		}
+		
 		return items;
 		
 	}
@@ -208,7 +216,7 @@ public class ItemService {
 		String content = "[재고30]\n" + name + "님 정상적으로 예약이 완료되었습니다.\n\n" + "가게 이름: " + shopname + "\n상품명: " + itemname + "\n수량: " + number;
 		
 		itemRepository.reservation(reservation);
-		//sendMessage(phone, content);
+		sendMessage(phone, content);
 		
 	}
 	
@@ -231,7 +239,7 @@ public class ItemService {
 			itemRepository.reservationCancel(ridx, itemidx, number);
 		}
 		String content = "[재고30]\n" + name + "님 정상적으로 예약이 취소되었습니다.\n";
-		//sendMessage(phone, content);
+		sendMessage(phone, content);
 	}
 	
     /*
@@ -247,7 +255,7 @@ public class ItemService {
     public void reservationCancelBusiness(int reservationIdx, Integer itemidx, Integer number, String name, String phone) {
     	itemRepository.reservationCancelBusiness(reservationIdx,itemidx,number);
     	String content = "[재고30]\n" + name + "님 상업자로부터 예약을 거절당하셨습니다.\n";
-    	//sendMessage(phone, content);
+    	sendMessage(phone, content);
     }
 	
 	/*
@@ -255,11 +263,11 @@ public class ItemService {
 	 */
 	public SingleMessageSentResponse sendMessage(String phone, String content) {
 		
-		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCSNIDGJX633DVCZ", "O5QWFUPOJQ6TUOTT1XOKICBFC0YYU3B2", "https://api.coolsms.co.kr");
+		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize("NCS9UG2XED3DLI5I", "TZKJX9RAOQBJO4AW3AWH1HJII4FVV83S", "https://api.coolsms.co.kr");
 		
 		Message message = new Message();
         // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
-        message.setFrom("01087528309");
+        message.setFrom("01077359350");
         message.setTo(phone);
         message.setText(content);
 

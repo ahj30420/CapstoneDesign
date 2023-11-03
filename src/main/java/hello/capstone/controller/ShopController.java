@@ -9,6 +9,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,9 +26,12 @@ import hello.capstone.dto.Member;
 import hello.capstone.dto.Ratings;
 import hello.capstone.dto.Shop;
 import hello.capstone.exception.LogInException;
+import hello.capstone.exception.ValidationException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.service.MemberService;
 import hello.capstone.service.ShopService;
+import hello.capstone.validation.group.SaveShopValidationGroup;
+import hello.capstone.validation.group.UpdateShopValidationGroup;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,38 +48,46 @@ public class ShopController {
 	private String fileDir;
 	
 	/*
-	 * 가게 등록
-	 */
-	@PostMapping("/shop/create")
-	public void shopCreate(@ModelAttribute Shop shop, HttpSession session) throws IllegalStateException, IOException {
-		Member member = (Member) session.getAttribute("member");
-		shop.setOwnerIdx(member.getMemberIdx());
-		
-		shopService.saveShop(shop);
-	}
-	
-	
-	/*
-	 * 가게 수정 - 이미지를 변경하지 않을떄 multipartFile가 null이기 때문에 @RequestParam으로 따로따로 받음
-	 */
-	@PutMapping("/shop/update")
-	public void shopUpdate(@RequestParam(value = "imageFile", required = false) MultipartFile Image,
-						   @RequestParam("shopidx") int shopIdx,
-						   @RequestParam("shopName") String shopName,
-						   @RequestParam("shopTel") String shopTel,
-						   @RequestParam(value = "shopAddress", required = false) String shopAddress,
-						   @RequestParam("promotionText") String promotionText,
-						   @RequestParam("shopWebsite") String shopWebsite) throws IllegalStateException, IOException {
-		
-		Shop oldShop = shopService.getShopByIdx(shopIdx);
-		
-		oldShop.setShopName(shopName);
-		oldShop.setShopTel(shopTel);
-		oldShop.setPromotionText(promotionText);
-		oldShop.setShopWebsite(shopWebsite);
-
-		shopService.updateShop(oldShop, Image, shopAddress);
-	}
+	    * 가게 등록
+	    */
+	   @PostMapping("/shop/create")
+	   public void shopCreate(@Validated(value = SaveShopValidationGroup.class) @ModelAttribute Shop shop, 
+	                     BindingResult bindingResult, HttpSession session) 
+	                           throws IllegalStateException, IOException {
+	      if(bindingResult.hasErrors()) {
+	          Map<String, String> errors = new HashMap<>();
+	          for (FieldError error : bindingResult.getFieldErrors()) {
+	               log.info("error in {} = {}", error.getField(), error.getDefaultMessage());
+	               errors.put(error.getField(), error.getDefaultMessage());
+	           }
+	          throw new ValidationException(errors);
+	       }
+	      
+	      Member member = (Member) session.getAttribute("member");
+	      shop.setOwnerIdx(member.getMemberIdx());
+	      log.info("shop = {}", shop);
+	      shopService.saveShop(shop);
+	   }
+	   
+	   
+	   /*
+	    * 가게 수정 - 이미지를 변경하지 않을떄 multipartFile가 null이기 때문에 @RequestParam으로 따로따로 받음
+	    */
+	   @PutMapping("/shop/update")
+	   public void shopUpdate(@Validated(value = UpdateShopValidationGroup.class) @ModelAttribute Shop shop, BindingResult bindingResult,
+	                     @RequestParam(value = "imagefile", required = false) MultipartFile Image ) throws IllegalStateException, IOException {
+	      log.info("shop = {}",shop);
+	      if(bindingResult.hasErrors()) {
+	          Map<String, String> errors = new HashMap<>();
+	          for (FieldError error : bindingResult.getFieldErrors()) {
+	               log.info("error in {} = {}", error.getField(), error.getDefaultMessage());
+	               errors.put(error.getField(), error.getDefaultMessage());
+	           }
+	          throw new ValidationException(errors);
+	       }
+	      
+	      shopService.updateShop(shop, Image, shop.getShopAddress());
+	   }
 	
 	@DeleteMapping("/shopDelete")
 	public void shopDelete(@RequestParam("shopidx") int shopidx) {
@@ -103,6 +117,7 @@ public class ShopController {
 	@GetMapping("/ShopMarker")
 	public List<Shop> ShopAddress(HttpSession session){
 		List<Shop> shops = shopService.getShops();
+		
 		return shops;
 	} 
 	

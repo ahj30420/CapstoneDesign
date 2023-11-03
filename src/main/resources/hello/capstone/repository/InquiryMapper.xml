@@ -7,6 +7,7 @@
 		select i.*, m.name
 		from inquiry i 
 		inner join member m on i.useridx = m.memberidx
+		where i.useridx = #{memberidx}
 		order by redate asc;
 	</select>
 

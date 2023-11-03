@@ -33,8 +33,10 @@ public class InquiryController {
 	 * 1:1문의 전체 나열
 	 */
 	@GetMapping("/view")
-	public List<Map<String, Object>> inquiryView(){
-		return inquiryService.inquiryView();
+	public List<Map<String, Object>> inquiryView(HttpSession session){
+		Member member = (Member) session.getAttribute("member");
+		int memberidx = member.getMemberIdx();
+		return inquiryService.inquiryView(memberidx);
 	}
 	
 	/*

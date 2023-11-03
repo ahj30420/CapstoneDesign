@@ -8,12 +8,16 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,8 +33,11 @@ import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Reservation;
 import hello.capstone.dto.Shop;
+import hello.capstone.exception.ValidationException;
 import hello.capstone.service.ItemService;
 import hello.capstone.service.ShopService;
+import hello.capstone.validation.group.SaveItemValidationGroup;
+import hello.capstone.validation.group.UpdateItemValidationGroup;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,59 +58,52 @@ public class ItemController {
     * item 등록
     */
    @PostMapping("/create")
-   public void itemCreate(@RequestParam("imageFile") MultipartFile imageFile,
-			              @RequestParam("shopidx") int shopIdx,
-			              @RequestParam("itemName") String itemName,
-			              @RequestParam("cost") int cost,
-			              @RequestParam("salecost") int saleCost,
-			              @RequestParam("quantity") int quantity,
-			              @RequestParam("category") String category,
-			              @RequestParam("itemnotice") String itemNotice,
-			              @RequestParam("endtime") String endParam,
-			              @RequestParam("starttime") String startParam) 
-			            		  throws IllegalStateException, IOException, ParseException{
+   public void itemCreate(@Validated(value = SaveItemValidationGroup.class) @ModelAttribute Item item, BindingResult bindingResult,
+		                  @RequestParam("startParam") String startParam,
+		                  @RequestParam("endParam") String endParam) throws IllegalStateException, IOException, ParseException{
 	   
-	   Item item = new Item();
+	   	if(bindingResult.hasErrors()) {
+			Map<String, String> errors = new HashMap<>();
+	    	for (FieldError error : bindingResult.getFieldErrors()) {
+	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
+	            errors.put(error.getField(), error.getDefaultMessage());
+	        }
+	    	throw new ValidationException(errors);
+		}
 	   
-	   item.setShopidx(shopIdx);
-	   item.setItemname(itemName);
-	   item.setImageFile(imageFile);
-	   item.setCost(cost);
-	   item.setQuantity(quantity);
-	   item.setCategory(category);
-	   item.setItemnotice(itemNotice);
-	   item.setSalecost(saleCost);
 	   item.setStarttime(convertStringToTimestamp(startParam));
 	   item.setEndtime(convertStringToTimestamp(endParam));
 	   
 	   itemService.saveItem(item);
    }
    
-   
    /*
     * 아이템 수정
     */
    @PutMapping("/update")
-   public void itemUpdate(@RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-			              @RequestParam("itemidx") int itemIdx,
-			              @RequestParam("itemName") String itemName,
-			              @RequestParam("cost") int cost,
-			              @RequestParam("salecost") int saleCost,
-			              @RequestParam("quantity") int quantity,
-			              @RequestParam("category") String category,
-			              @RequestParam("itemnotice") String itemNotice,
-			              @RequestParam(value = "endtime", required = false) String endParam,
-			              @RequestParam(value = "starttime", required = false) String startParam) 
+   public void itemUpdate(@Validated(value = UpdateItemValidationGroup.class) @ModelAttribute Item item, BindingResult bindingResult, 
+		                  @RequestParam(value = "imageF", required = false) MultipartFile imageFile,
+			              @RequestParam(value = "endParam", required = false) String endParam,
+			              @RequestParam(value = "startParam", required = false) String startParam) 
 			            		  throws ParseException, IllegalStateException, IOException {
 	   
-	   Item oldItem = itemService.findByItemIdx(itemIdx);
+	   	if(bindingResult.hasErrors()) {
+			Map<String, String> errors = new HashMap<>();
+	    	for (FieldError error : bindingResult.getFieldErrors()) {
+	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
+	            errors.put(error.getField(), error.getDefaultMessage());
+	        }
+	    	throw new ValidationException(errors);
+		}
+	   
+	   Item oldItem = itemService.findByItemIdx(item.getItemidx());
 
-	   oldItem.setItemname(itemName);
-	   oldItem.setCost(cost);
-	   oldItem.setSalecost(saleCost);
-	   oldItem.setQuantity(quantity);
-	   oldItem.setCategory(category);
-	   oldItem.setItemnotice(itemNotice);
+	   oldItem.setItemname(item.getItemname());
+	   oldItem.setCost(item.getCost());
+	   oldItem.setSalecost(item.getSalecost());
+	   oldItem.setQuantity(item.getQuantity());
+	   oldItem.setCategory(item.getCategory());
+	   oldItem.setItemnotice(item.getItemnotice());
 	   log.info("endparam = {}", endParam);
 	   if(endParam != null || endParam =="" ) {
 		   oldItem.setEndtime(convertStringToTimestamp(endParam));

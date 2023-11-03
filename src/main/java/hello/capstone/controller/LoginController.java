@@ -24,7 +24,8 @@ import hello.capstone.exception.ValidationException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.service.LoginService;
 import hello.capstone.service.MemberService;
-import hello.capstone.validation.ValidationSequence;
+import hello.capstone.validation.group.SignUpValidationGroup;
+import hello.capstone.validation.group.UpdatePwValidationGroup;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class LoginController {
 	 * 일반 회원 회원가입
 	 */
     @PostMapping("/join")
-    public String signUp(@Validated(value = ValidationSequence.class) @RequestBody Member member, BindingResult bindingResult){
+    public String signUp(@Validated(value = SignUpValidationGroup.class) @RequestBody Member member, BindingResult bindingResult){
     	
     	log.info("id ={}",member.getId());
     	log.info("pw={}",member.getPw());
@@ -96,12 +97,12 @@ public class LoginController {
     	return "home_user";
     }
     
-    
     @GetMapping("/getSessionMember")
     public Member getSessionMember(HttpSession session) {
+    	Member member = (Member)session.getAttribute("member"); 
+    	member.maskSensitiveInformation();
     	
-    	log.info("member = {}", (Member)session.getAttribute("member"));
-    	return (Member)session.getAttribute("member");
+    	return member;
     }
     
     @GetMapping("/SessionLogout")
@@ -109,6 +110,19 @@ public class LoginController {
     	
     	session.removeAttribute("member");
     	log.info("로그아웃 성공. 현재 멤버 세션 = {}", session.getAttribute("member"));
+    }
+    
+    @GetMapping("/getSessionMember/business")
+    public Member getSessionMemberBusiness(HttpSession session) {
+    	Member member = (Member)session.getAttribute("member"); 
+    	member.maskSensitiveInformation();
+    	
+    	return member;
+    }
+    @GetMapping("/getSessionMember/getSessionMemberManager")
+    public Member getSessionMemberManager(HttpSession session) {
+       
+       return (Member)session.getAttribute("member");
     }
     
     /*
@@ -189,19 +203,30 @@ public class LoginController {
     	}
     }
     
-    /*
-     * 비밀번호 새 설정
-     */
     @PutMapping("/updatepw")
-    public String updatepw(@RequestBody HashMap<String,String> pw, HttpServletRequest request) {
-    	String password = pw.get("pw");
-    	HttpSession session = request.getSession();
-    	Member member = (Member)session.getAttribute("findpw_member");
-    	memberService.updatepw(member.getId(),password);
-    	session.removeAttribute("findpw_member");
-    	return "/login";
+    public String updatePw(@Validated(value = UpdatePwValidationGroup.class) @RequestBody Member memberPw, BindingResult bindingResult, HttpServletRequest request) {
+       //변경 비밀번호 검증 및 암호화
+       if(bindingResult.hasErrors()) {
+          Map<String, String> errors = new HashMap<>();
+          for (FieldError error : bindingResult.getFieldErrors()) {
+               log.info("{} = {}", error.getField(), error.getDefaultMessage());
+               errors.put(error.getField(), error.getDefaultMessage());
+           }
+          throw new ValidationException(errors);
+       }
+       
+       
+       HttpSession session = request.getSession();
+       Member member = (Member)session.getAttribute("findpw_member");
+       
+       //암호화
+       String pw = bCryptPasswordEncoder.encode(memberPw.getPw());
+       
+       memberService.updatepw(member.getId(),pw);
+       session.removeAttribute("find_member");
+       
+       return "/login";
     }
-    
     /*
      * 아이디 찾기(이름, 휴대폰 인증 성공 후 실제로 아이디 정보 보여주기)
      */

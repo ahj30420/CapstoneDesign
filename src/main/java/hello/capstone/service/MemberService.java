@@ -2,6 +2,7 @@ package hello.capstone.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberService {
 	private final MemberRepository memberRepository;
 	private final ShopRepository shopRepository;
+	private final PasswordEncoder bCryptPasswordEncoder;
 	
 	/*
 	 * 멤버의 멤버인덱스 조회
@@ -155,12 +157,15 @@ public class MemberService {
 	 * 비밀번호 일치 확인
 	 */
 	
-	public void pwCheck(Member member, String oldPw) {
-
-		if(!(member.getPw().equals(oldPw))) {
+	public void pwCheck(String id, String oldPw) {
+		
+		Member userMember = memberRepository.findById(id,"normal");
+		
+		boolean pwCheck = bCryptPasswordEncoder.matches(oldPw, userMember.getPw());
+		if(!pwCheck) {
 	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
 	      }
-	
+		
 	}
 	
 
