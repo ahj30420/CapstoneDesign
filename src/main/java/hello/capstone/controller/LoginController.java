@@ -1,13 +1,16 @@
 package hello.capstone.controller;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,25 +43,20 @@ public class LoginController {
 	
 	private final LoginService loginService;
 	private final MemberService memberService;
-	private final PasswordEncoder bCryptPasswordEncoder;
+	private final PasswordEncoder bCryptPasswordEncoder;	
+	private final MessageSource messageSource;
 	
 	/*
 	 * 일반 회원 회원가입
 	 */
     @PostMapping("/join")
-    public String signUp(@Validated(value = SignUpValidationGroup.class) @RequestBody Member member, BindingResult bindingResult){
+    public String signUp(@RequestBody @Validated(value = SignUpValidationGroup.class) Member member, BindingResult bindingResult){
     	
-    	log.info("id ={}",member.getId());
-    	log.info("pw={}",member.getPw());
-    	log.info("name ={}",member.getName());
-    	log.info("phone={}",member.getPhone());
-    	log.info("role={}",member.getRole());
-
     	if(bindingResult.hasErrors()) {
     		Map<String, String> errors = new HashMap<>();
 	    	for (FieldError error : bindingResult.getFieldErrors()) {
-	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
-	            errors.put(error.getField(), error.getDefaultMessage());
+	    		String em = messageSource.getMessage(error, Locale.getDefault());
+	            errors.put(error.getField(), em);
 	        }
 	    	throw new ValidationException(errors);
     	}

@@ -22,7 +22,6 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'

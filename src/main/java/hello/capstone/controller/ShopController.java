@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -43,6 +46,7 @@ public class ShopController {
 	
 	private final MemberService memberService;
 	private final ShopService shopService;
+	private final MessageSource messageSource;
 	
 	@Value("${file.dir}")
 	private String fileDir;
@@ -57,8 +61,8 @@ public class ShopController {
 	      if(bindingResult.hasErrors()) {
 	          Map<String, String> errors = new HashMap<>();
 	          for (FieldError error : bindingResult.getFieldErrors()) {
-	               log.info("error in {} = {}", error.getField(), error.getDefaultMessage());
-	               errors.put(error.getField(), error.getDefaultMessage());
+		    		String em = messageSource.getMessage(error, Locale.getDefault());
+		            errors.put(error.getField(), em);
 	           }
 	          throw new ValidationException(errors);
 	       }
@@ -80,8 +84,8 @@ public class ShopController {
 	      if(bindingResult.hasErrors()) {
 	          Map<String, String> errors = new HashMap<>();
 	          for (FieldError error : bindingResult.getFieldErrors()) {
-	               log.info("error in {} = {}", error.getField(), error.getDefaultMessage());
-	               errors.put(error.getField(), error.getDefaultMessage());
+		    		String em = messageSource.getMessage(error, Locale.getDefault());
+		            errors.put(error.getField(), em);
 	           }
 	          throw new ValidationException(errors);
 	       }

@@ -54,7 +54,7 @@
    <delete id="deleteTimeoutAlarm">
         delete 
 		from alarm
-		where TIMESTAMPDIFF(hour, regisdate, NOW()) >= 24;
+		where TIMESTAMPDIFF(hour, regisdate, NOW()) &gt;= 24;
    </delete>
    
    <delete id="deleteReadAlarm">

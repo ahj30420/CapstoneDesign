@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -50,6 +52,7 @@ public class ItemController {
 
    private final ItemService itemService;
    private final ShopService shopService;
+	private final MessageSource messageSource;
    
    @Value("${itemfile.dir}")
    private String fileDir;
@@ -65,8 +68,8 @@ public class ItemController {
 	   	if(bindingResult.hasErrors()) {
 			Map<String, String> errors = new HashMap<>();
 	    	for (FieldError error : bindingResult.getFieldErrors()) {
-	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
-	            errors.put(error.getField(), error.getDefaultMessage());
+	    		String em = messageSource.getMessage(error, Locale.getDefault());
+	            errors.put(error.getField(), em);
 	        }
 	    	throw new ValidationException(errors);
 		}
@@ -90,8 +93,8 @@ public class ItemController {
 	   	if(bindingResult.hasErrors()) {
 			Map<String, String> errors = new HashMap<>();
 	    	for (FieldError error : bindingResult.getFieldErrors()) {
-	            log.info("{} = {}", error.getField(), error.getDefaultMessage());
-	            errors.put(error.getField(), error.getDefaultMessage());
+	    		String em = messageSource.getMessage(error, Locale.getDefault());
+	            errors.put(error.getField(), em);
 	        }
 	    	throw new ValidationException(errors);
 		}

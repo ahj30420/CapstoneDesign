@@ -23,30 +23,31 @@ public class Item {
 	private int itemidx;
 	private int shopidx;
 	
-	@Size(min = 1, max = 20, message = "상품 이름은 20자 이내여야 합니다.", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	@NotBlank(message = "상품 이름은 필수 입력항목입니다.(공백 사용X)", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@Size(min = 1, max = 20,groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@NotBlank(groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
 	private String itemname;
 	
-	@Range(min = 1, max = 100000, message = "원가는 1~1000000원 사이여야 합니다.", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	@NotNull(message = "원가는 필수 입력항목입니다.(공백 사용X)", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	private Integer cost;
+	@Range(min = 1, max = 100000, groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@NotNull(groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	private int cost;
 	
-	@Range(min = 1, max = 100000, message = "할인가격은 1~1000000원 사이여야 합니다.", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	@NotNull(message = "할인가격은 필수 입력항목입니다.(공백 사용X)", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	private Integer salecost;
+	@Range(min = 1, max = 100000,groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@NotNull(groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	private int salecost;
 	
-	@Range(min = 1, max = 1000, message = "수량은 1~1000개 사이여야 합니다.", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	@NotNull(message = "수량은 필수 입력항목입니다.(공백 사용X)", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	private Integer quantity;
+	@Range(min = 1, max = 1000, groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@NotNull(groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	private int quantity;
 	
 	private String itemnotice;
 	
+	@NotNull(groups = SaveItemValidationGroup.class)
 	private MultipartFile imageFile;
 	
 	private String image;
 	
-	@Size(min = 1, max = 20, message = "상품 이름은 20자 이내여야 합니다.", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
-	@NotBlank(message = "카테고리는 필수 입력항목입니다.(공백 사용X)", groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@Size(min = 1, max = 20,groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
+	@NotBlank(groups = {SaveItemValidationGroup.class, UpdateItemValidationGroup.class})
 	private String category;
 	
 	private Timestamp  starttime;
