@@ -7,11 +7,17 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +30,13 @@ import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import hello.capstone.dto.Alarm;
 import hello.capstone.exception.LogInException;
+import hello.capstone.exception.ValidationException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.service.ItemService;
 import hello.capstone.service.MemberService;
 import hello.capstone.service.ShopService;
+import hello.capstone.validation.group.UpdateInfoValidationGroup;
+import hello.capstone.validation.group.UpdatePwValidationGroup;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +51,7 @@ public class MemberController {
 	private final ShopService shopService;
 	private final ItemService itemService;
 	private final PasswordEncoder bCryptPasswordEncoder;
+	private final MessageSource messageSource;
 	
 	
 	/*
@@ -110,47 +120,54 @@ public class MemberController {
 	}
 	
 	/*
-	 * 비밀번호 수정
-	 */
-	@PutMapping("/update/pw")
-	public String updatePw(@RequestBody HashMap<String,String> pwMap, HttpSession session) {
-		log.info("pwMap = {}", pwMap);
-		String oldPw = pwMap.get("oldpw");
-		String newPw = pwMap.get("newpw");
-		Member member = (Member)session.getAttribute("member");
-		memberService.pwCheck(member.getId(), oldPw);
-		
-		String pw = bCryptPasswordEncoder.encode(newPw);
-		
-		Member newMember = memberService.updatePwOnPurpose(member, pw);
-		newMember.maskSensitiveInformation();
-		session.setAttribute("member", newMember);
-		
-		return "/";
-	}
-	
-	/*
-	 * 회원정보 수정
-	 */
-	@PutMapping("/update/info")
-	public String updateInfo(@RequestBody HashMap<String, String> newMemberMap, HttpSession session) {
-		log.info("newMemberMap = {}", newMemberMap);
-		Member oldMember = (Member) session.getAttribute("member");
-		String newName = newMemberMap.get("newname");
-		String newNickname = newMemberMap.get("newnickname");
-		String newPhone = newMemberMap.get("newphone");
-		
-		Member newMember = new Member();
-		newMember.setName(newName);
-		newMember.setNickname(newNickname);
-		newMember.setPhone(newPhone);
-		
-		newMember = memberService.updateMember(oldMember, newMember);
-		
-		session.setAttribute("member", newMember);
-		
-		return "home_user";
-	}
+    * 비밀번호 수정
+    */
+   @PutMapping("/update/pw")
+   public String updatePw(@Validated(value = UpdatePwValidationGroup.class) @ModelAttribute Member member, BindingResult bindingResult,
+                     @RequestParam("oldpw") String oldPw,HttpSession session) {
+      
+      if(bindingResult.hasErrors()) {
+          Map<String, String> errors = new HashMap<>();
+          for (FieldError error : bindingResult.getFieldErrors()) {
+	    		String em = messageSource.getMessage(error, Locale.getDefault());
+	            errors.put(error.getField(), em);
+           }
+          throw new ValidationException(errors);
+       }
+      
+      Member oldMember = (Member)session.getAttribute("member");
+      memberService.pwCheck(oldMember, oldPw);
+      
+      Member newMember = memberService.updatePwOnPurpose(oldMember, member.getPw());
+      newMember.maskSensitiveInformation();
+      session.setAttribute("member", newMember);
+      
+      return "/";
+   }
+	   
+	   /*
+	    * 회원정보 수정
+	    */
+	   @PutMapping("/update/info")
+	   public String updateInfo(@Validated(value = UpdateInfoValidationGroup.class) @RequestBody Member member, 
+	                      BindingResult bindingResult, HttpSession session) {
+	      
+	      if(bindingResult.hasErrors()) {
+	          Map<String, String> errors = new HashMap<>();
+	          for (FieldError error : bindingResult.getFieldErrors()) {
+		    		String em = messageSource.getMessage(error, Locale.getDefault());
+		            errors.put(error.getField(), em);
+	           }
+	          throw new ValidationException(errors);
+	       }
+	      
+	      Member oldMember = (Member) session.getAttribute("member");
+	      oldMember = memberService.updateMember(oldMember, member);
+	      
+	      session.setAttribute("member", oldMember);
+	      
+	      return "home_user";
+	   }
 	
 	
 	/*
@@ -160,7 +177,7 @@ public class MemberController {
 	public String deleteMember(HttpSession session, String pw) {
 		
 		Member member = (Member) session.getAttribute("member");
-		memberService.pwCheck(member.getId(), pw);
+		memberService.pwCheck(member, pw);
 		memberService.deleteMember(member);
 		
 		session.removeAttribute("member");

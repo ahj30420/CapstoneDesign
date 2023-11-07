@@ -138,60 +138,53 @@ public class ShopController {
 	}
 	
 	/*
-	 * 필터를 적용한 가게 조회 거리, 가격, 마감시간
-	 */
-	@GetMapping("/getShop/filter")
-    public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
-                                  @RequestParam("longitude") String myLongitude,
-                                  @RequestParam(value = "distance", defaultValue = "0") String distance,
-                                  @RequestParam(value = "unit", defaultValue = "km") String unit,
-                                  @RequestParam(value = "price", defaultValue = "0") String itemprice,
-                                  @RequestParam(value = "time", defaultValue = "0") String time,
-                                  @RequestParam(value = "rating", defaultValue = "0") String shoprating){
-      
-
-       List<Shop> allShops = shopService.getShops();
-      
-       log.info("allShops = {}", allShops);
-       double latitude = Double.parseDouble(myLatitude);
-       double longitude = Double.parseDouble(myLongitude);
-       double dist = Double.parseDouble(distance);
-       int price = Integer.parseInt(itemprice);
-       double rating = Double.parseDouble(shoprating);
-       long minute = Long.parseLong(time) * 60;
-
-       
-       if(dist != 0) {
-          List<Shop> distanceFilteredShops = shopService.runDistanceFilter(latitude, longitude, dist, unit);
-          if(distanceFilteredShops != null) {   
-             allShops.retainAll(distanceFilteredShops);
-             log.info("distanceFilteredShops = {}", distanceFilteredShops);   
-          }
-       }   
-       if(price != 0) {
-          List<Shop> priceFilteredShops = shopService.runPriceFilter(price);
-          if(priceFilteredShops != null) {   
-             allShops.retainAll(priceFilteredShops);
-             log.info("priceFilteredShops= {}", priceFilteredShops);   
-          }
-       }
-       if(minute != 0) {
-           List<Shop> deadlineFilteredShops = shopService.runDeadlineFilter(minute);   
-           if(deadlineFilteredShops != null) {   
-              allShops.retainAll(deadlineFilteredShops);
-              log.info("deadlineFilteredShops= {}", deadlineFilteredShops);   
-           }
-        }       
-       if(rating != 0) {
-    	   List<Shop> ratingFilteredShops = shopService.runRatingFilter(rating);
-    	   if(ratingFilteredShops != null) {
-    		   allShops.retainAll(ratingFilteredShops);
-    		   log.info("ratingFilteredShops = {}", ratingFilteredShops);
-    	   }
-       }
-      
-       return allShops;
-    }
+	    * 필터를 적용한 가게 조회 거리, 가격, 마감시간
+	    */
+	   @GetMapping("/getShop/filter")
+	    public List<Shop> getShopFilterDistance(@RequestParam("latitude") String myLatitude,
+	                                          @RequestParam("longitude") String myLongitude,
+	                                          @RequestParam(value = "distance", defaultValue = "0") double dist,
+	                                          @RequestParam(value = "unit", defaultValue = "km") String unit,
+	                                          @RequestParam(value = "maxprice", defaultValue = "0") int maxPrice,
+	                                          @RequestParam(value = "minprice", defaultValue = "0") int minPrice,
+	                                          @RequestParam(value = "time", defaultValue = "0") String time,
+	                                          @RequestParam(value = "rating", defaultValue = "0") double rating){
+	      
+	      
+	       List<Shop> allShops = shopService.getShops();
+	      
+	       double latitude = Double.parseDouble(myLatitude);
+	       double longitude = Double.parseDouble(myLongitude);
+	       long minute = Long.parseLong(time) * 60;
+	       
+	       
+	       if(dist != 0) {
+	          List<Shop> distanceFilteredShops = shopService.runDistanceFilter(latitude, longitude, dist, unit);
+	          if(distanceFilteredShops != null) {   
+	             allShops.retainAll(distanceFilteredShops); 
+	          }
+	       }   
+	       if(maxPrice != 0) {
+	          List<Shop> priceFilteredShops = shopService.runPriceFilter(maxPrice, minPrice);
+	          if(priceFilteredShops != null) {   
+	             allShops.retainAll(priceFilteredShops);
+	          }
+	       }
+	       if(minute != 0) {
+	           List<Shop> deadlineFilteredShops = shopService.runDeadlineFilter(minute);   
+	           if(deadlineFilteredShops != null) {   
+	              allShops.retainAll(deadlineFilteredShops); 
+	           }
+	        }       
+	       if(rating != 0) {
+	          List<Shop> ratingFilteredShops = shopService.runRatingFilter(rating);
+	          if(ratingFilteredShops != null) {
+	             allShops.retainAll(ratingFilteredShops);
+	          }
+	       }
+	      
+	       return allShops;
+	    }
     
     
     /*

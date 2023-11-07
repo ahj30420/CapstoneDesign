@@ -74,11 +74,11 @@ public class ShopRepository {
 		return shopMapper.getShopByMember(memberidx);
 	}
 	/*
-	 * 가격 필터에 해당되는 가게 조회
-	 */
-	public List<Shop> runPriceFilter(int price){
-		return shopMapper.runPriceFilter(price);
-	}
+    * 가격 필터에 해당되는 가게 조회
+    */
+   public List<Shop> runPriceFilter(int maxPrice, int minPrice){
+      return shopMapper.runPriceFilter(maxPrice, minPrice);
+   }
 	
 	/*
 	 * 별점 필터에 해당되는 가게 조회

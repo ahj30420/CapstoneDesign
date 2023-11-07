@@ -44,12 +44,15 @@
 	</update>
 	
 	<select id = "runPriceFilter" resultType = "Shop">
-		select * 
-		from shop 
-		where shopidx in (
-			select distinct shopidx from item where salecost &lt;= #{price} and endtime &gt;= #{now()}
-		);
-	</select>
+	      select * 
+	      from shop 
+	      where shopidx in (
+	         select distinct shopidx from item 
+	         where salecost &lt;= #{maxPrice} and 
+	         salecost &gt;= #{minPrice} and 
+	         endtime &gt;= now()
+	      );
+	 </select>
 	
 	<select id = "runRatingFilter" resultType = "Shop">
 		select distinct s.*

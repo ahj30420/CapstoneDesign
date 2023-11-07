@@ -154,19 +154,16 @@ public class MemberService {
 	
 	
 	/*
-	 * 비밀번호 일치 확인
-	 */
+    * 비밀번호 일치 확인
+    */
+	   
+	   public void pwCheck(Member member, String oldPw) {
 	
-	public void pwCheck(String id, String oldPw) {
-		
-		Member userMember = memberRepository.findById(id,"normal");
-		
-		boolean pwCheck = bCryptPasswordEncoder.matches(oldPw, userMember.getPw());
-		if(!pwCheck) {
-	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
-	      }
-		
-	}
+			boolean pwCheck = bCryptPasswordEncoder.matches(oldPw, member.getPw());
+			if(!pwCheck) {
+		    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
+		      }
+	   }
 	
 
 	/*

@@ -117,13 +117,13 @@ public class ShopService {
 	}
 	
 	/*
-	 * 가격 필터가 적용된 가게 조회
-	 */
-	public List<Shop> runPriceFilter(int price){
-		 List<Shop> filteredShops = shopRepository.runPriceFilter(price);
-		 
-		 return filteredShops;
-	}
+    * 가격 필터가 적용된 가게 조회
+    */
+   public List<Shop> runPriceFilter(int maxPrice, int minPrice){
+       List<Shop> filteredShops = shopRepository.runPriceFilter(maxPrice, minPrice);
+       
+       return filteredShops;
+   }
 	/*
 	 * 거리필터가 적용된 가게 조회, 좌표 간 계산식 참고 출처 https://frontmaster.tistory.com/135
 	 */

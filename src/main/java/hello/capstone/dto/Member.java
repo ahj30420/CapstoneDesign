@@ -3,6 +3,7 @@ package hello.capstone.dto;
 import java.sql.Date;
 
 import hello.capstone.validation.group.SignUpValidationGroup;
+import hello.capstone.validation.group.UpdateInfoValidationGroup;
 import hello.capstone.validation.group.UpdatePwValidationGroup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,7 +37,9 @@ public class Member {
    @Pattern(regexp = "^[가-힣a-zA-Z]{1,6}$", groups = SignUpValidationGroup.class)
    @NotBlank(groups = SignUpValidationGroup.class)
    private String name;
-    
+   
+   
+   @Pattern(regexp = "^[가-힣a-zA-Z0-9]{1,15}$", groups = UpdateInfoValidationGroup.class)
    private String nickname;
     
    @Pattern(regexp = "^01[016789]\\d{7,8}$", groups = SignUpValidationGroup.class)
