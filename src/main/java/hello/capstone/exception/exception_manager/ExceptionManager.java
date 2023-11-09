@@ -27,6 +27,7 @@ import hello.capstone.exception.TimeSettingException;
 import hello.capstone.exception.ValidationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import hello.capstone.exception.AdminLoginException;
 import hello.capstone.exception.AlreadyBookmarkedShopException;
 import hello.capstone.exception.CodeVerificationException;
 import hello.capstone.exception.ExistReservationException;
@@ -166,4 +167,10 @@ public class ExceptionManager {
     public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getErrors());
     }
+	//기존에 만들어둔 에러(AdminLoginException)가 발생시 동작
+	@ExceptionHandler(AdminLoginException.class)
+	public ResponseEntity<?> AdminLoginExceptionHandler(AdminLoginException e){
+	   return ResponseEntity.status(e.getErrorCode().getStatus())
+	           .body(Response.error(e.getErrorCode().name(),e.getErrorCode().getMessage()));
+	}
 }

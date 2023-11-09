@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,98 +38,93 @@ public class ManagerController {
 	
 	private final ManagerService managerService;
 	
-	//공지사항------------------------------------------------------------------------------------------
-	
-	/*
-	 * 공지사항 CREATE
-	 */
-	@PostMapping("/notice/create")
-	public void noticeCreate(@RequestBody Notice notice) {
-		managerService.noticeCreate(notice);
-		
-	}
-	
-	/*
-	 * 공지사항 READ 
-	 */
-	@GetMapping("/notice/read")
-	public Notice noticeRead(@RequestParam String noticeIdx, @RequestParam String title ){
-		int idx = Integer.parseInt(noticeIdx);
-		
-		return managerService.noticeRead(idx, title);
-	}
-	
-	/*
-	 * 공지사항 UPDATE
-	 */
-	@PutMapping("/notice/update")
-	public void noticeUpdate(@RequestBody Notice newNotice) {
-		managerService.noticeUpdate(newNotice);
-	}
-	
-	/*
-	 * 공지사항 DELETE
-	 */
-	@DeleteMapping("/notice/delete")
-	public void noticeDelete(@RequestBody Notice notice) {
-		managerService.noticeDelete(notice);
-	}
-	
-	/*
-	 * 모든 공지사항 READ 
-	 */
-	@GetMapping("/notice/readall")
-	public List<Notice> noticeReadAll(){
-		
-		return managerService.noticeReadAll();
-	}
-	
-	
-	/*
-	 * 공지사항 알림 가져오기
-	 */
-	@GetMapping("/notice/getalarm")
-	public List<Map<String, Object>> getNoticeAlarm(){
-		List<Map<String, Object>> notices = managerService.noticeGetAlarm();
+   //공지사항------------------------------------------------------------------------------------------
+	   
+   /*
+    * 공지사항 CREATE
+    */
+   @PostMapping("/notice/create")
+   public void noticeCreate(@ModelAttribute Notice notice) {
+      managerService.noticeCreate(notice);
+      
+   }
+   
+   /*
+    * 공지사항 READ 
+    */
+   @GetMapping("/notice/read")
+   public Map<String,Object> noticeRead(@RequestParam int noticeIdx ){
 
-		
-		return notices;
-	}
-	
-	
-	
+      return managerService.noticeRead(noticeIdx);
+   }
+   
+   /*
+    * 공지사항 UPDATE
+    */
+   @PutMapping("/notice/update")
+   public Map<String,Object> noticeUpdate(@ModelAttribute Notice newNotice) {
+      managerService.noticeUpdate(newNotice);
+      return noticeRead(newNotice.getNoticeIdx());
+   }
+   
+   /*
+    * 공지사항 DELETE
+    */
+   @DeleteMapping("/notice/delete")
+   public void noticeDelete(@RequestParam int noticeIdx) {
+      managerService.noticeDelete(noticeIdx);
+   }
+   
+   /*
+    * 모든 공지사항 READ 
+    */
+   @GetMapping("/notice/readall")
+   public List<Map<String, Object>> noticeReadAll(){
+      
+      return managerService.noticeReadAll();
+   }
+   
+   /*
+    * 공지사항 알림 가져오기
+    */
+   @GetMapping("/notice/getalarm")
+   public List<Map<String, Object>> getNoticeAlarm(){
+      List<Map<String, Object>> notices = managerService.noticeGetAlarm();
+
+      
+      return notices;
+   }
+   
+
+
 	//사용자 관리---------------------------------------------------------------------------------------
-	
 	/*
-	 * 일반 사용자 조회
-	 */
-	@GetMapping("/member/user")
-	public List<Member> getUserMember(){
-		
-		return managerService.getMemberByRole("사용자");
-	}
-	
-	/*
-	 * 신뢰도를 깎은 가게와 예약 날짜 조회
-	 */
-	@GetMapping("/member/user/trustmanage")
-	public List<Pair<Shop, String>> trustManage(@RequestParam("memberIdx") String memberidx){
-		int memberIdx = Integer.parseInt(memberidx);
-		List<Pair<Shop, String>> ShopAndDate = managerService.getFailedReservation(memberIdx);
-		
-		return ShopAndDate;
-	}
-	
-	/*
-	 * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
-	 */
-	@GetMapping("/member/user/trustmanage/item")
-	public List<Item> failItem(@RequestParam("shopIdx") String shopidx){
-		int shopIdx = Integer.parseInt(shopidx);
-		
-		
-		return managerService.getFailedItems(shopIdx);
-	}
+	    * 일반 사용자 조회
+	    */
+	   @GetMapping("/member/user")
+	   public List<Member> getUserMember(){
+	      
+	      return managerService.getMemberByRole("사용자");
+	   }
+	   
+	   /*
+	    * 신뢰도를 깎은 가게와 예약 날짜 조회
+	    */
+	   @GetMapping("/member/user/trustmanage")
+	   public List<Map<String, Object>> trustManage(@RequestParam("memberIdx") int memberIdx){      
+	      
+	      return managerService.getFailedReservation(memberIdx);
+	   }
+	   
+	   /*
+	    * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
+	    */
+	   @GetMapping("/member/user/trustmanage/item")
+	   public List<Map<String, Object>> failItem(@RequestParam("shopidx") int shopIdx, @RequestParam("memberidx") int memberIdx  ){
+	   
+	      return managerService.getFailedItems(shopIdx,memberIdx);
+	   }
+
 	
 	
 	//상업자 관리---------------------------------------------------------------------------------------
@@ -180,7 +176,7 @@ public class ManagerController {
 	 * 모든 가게 정보 조회
 	 */
 	@GetMapping("/analysis/shop")
-	public List<Shop> getShopinfo(){
+	public List<Map<String, Object>> getShopinfo(){
 		return managerService.getShopinfo();
 	}
 	
@@ -191,15 +187,7 @@ public class ManagerController {
 	public List<Map<String, Object>> AnalysisItem(@RequestParam("shopidx") int shopidx){
 		return managerService.getIteminfo(shopidx);
 	}
-	
-	/*
-	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회(2) -> 예약자 수 클릭시 예약자 정보와 예약한 상품 수, 구매 확정 여부 표시
-	 */
-	@GetMapping("/analysis/item/reservation/client")
-	public List<Map<String, Object>> AnalysisReservationClient(@RequestParam("itemidx") int itemidx){
-		return managerService.getReservationClient(itemidx);
-	}
-	
+
 	/*
 	 * 별점 카테고리(0,1,2,3,4,5) 별 인원수(1)
 	 */
@@ -221,7 +209,7 @@ public class ManagerController {
 	 * 해당 가게에서 상품을 구매해간 고객 정보 
 	 */
 	@GetMapping("/analysis/reservation/member")
-	public List<Member> AnalysisReservation(@RequestParam("shopidx") int shopidx){
+	public List<Map<String, Object>> AnalysisReservation(@RequestParam("shopidx") int shopidx){
 		return managerService.getReservationMember(shopidx);
 	}
 

@@ -21,49 +21,47 @@ public class ManagerRepository {
 
 	private final ManagerMapper managerMapper;
 
-	//공지사항------------------------------------------------------------------------------------------
-	
 	/*
-	 * 공지사항 CREATE
-	 */
-	public void noticeCreate(Notice notice) {
-		managerMapper.noticeCreate(notice);
-	}
-	
-	/*
-	 * 공지사항 READ
-	 */
-	public Notice noticeRead(int noticeIdx, String title) {
-		return managerMapper.noticeRead(noticeIdx, title);
-	}
-	
-	/*
-	 * 공지사항 UPDATE
-	 */
-	public void noticeUpdate(Notice newNotice) {
-		managerMapper.noticeUpdate(newNotice);
-	}
-	
-	/*
-	 * 공지사항 DELETE
-	 */
-	public void noticeDelete(Notice notice) {
-		managerMapper.noticeDelete(notice);
-	}
-	
-	/*
-	 * 공지사항 READ
-	 */
-	public List<Notice> noticeReadAll(){
-		return managerMapper.noticeReadAll();
-	}
-	
-	/*
-	 * 공지사항 알림
-	 */
-	public List<Map<String, Object>> noticeGetAlarm(){
-		return managerMapper.noticeGetAlarm();
-	}
+    * 공지사항 CREATE
+    */
+   public void noticeCreate(Notice notice) {
+      managerMapper.noticeCreate(notice);
+   }
+   
+   /*
+    * 공지사항 READ
+    */
+   public Map<String,Object> noticeRead(int noticeIdx) {
+      return managerMapper.noticeRead(noticeIdx);
+   }
+   
+   /*
+    * 공지사항 UPDATE
+    */
+   public void noticeUpdate(Notice newNotice) {
+      managerMapper.noticeUpdate(newNotice);
+   }
+   
+   /*
+    * 공지사항 DELETE
+    */
+   public void noticeDelete(int noticeIdx) {
+      managerMapper.noticeDelete(noticeIdx);
+   }
+   
+   /*
+    * 공지사항 READ
+    */
+   public List<Map<String, Object>> noticeReadAll(){
+      return managerMapper.noticeReadAll();
+   }
+   
+   /*
+    * 공지사항 알림
+    */
+   public List<Map<String, Object>> noticeGetAlarm(){
+      return managerMapper.noticeGetAlarm();
+   }
 	
 	//사용자 관리---------------------------------------------------------------------------------------
 	
@@ -75,18 +73,18 @@ public class ManagerRepository {
 	}
 	
 	/*
-	 * 실패한 예약 조회(신뢰도가 깎인 예약)
-	 */
-	public List<Reservation> getFailedReservation(int memberIdx){
-		return managerMapper.getFailedReservation(memberIdx);
-	}
-	
-	/*
-	 * 신뢰도가 깎인 가게에서 예약한 상품
-	 */
-	public List<Item> getFailedItems(int shopIdx){
-		return managerMapper.getFailedItems(shopIdx);
-	}
+    * 실패한 예약 조회(신뢰도가 깎인 예약) 깎은 가게와 횟수
+    */
+   public List<Map<String, Object>> getFailedReservation(int memberIdx){
+      return managerMapper.getFailedReservation(memberIdx);
+   }
+   
+   /*
+    * 신뢰도가 깎인 가게에서 예약한 상품
+    */
+   public List<Map<String, Object>> getFailedItems(int shopIdx, int memberIdx){
+      return managerMapper.getFailedItems(shopIdx, memberIdx);
+   }
 	
 	
 	
@@ -113,7 +111,7 @@ public class ManagerRepository {
 	/*
 	 * 모든 가게 정보 조회
 	 */
-	public List<Shop> getShopinfo(){
+	public List<Map<String, Object>> getShopinfo(){
 		return managerMapper.getShopinfo();
 	}
 	
@@ -123,13 +121,6 @@ public class ManagerRepository {
 	public List<Map<String, Object>> getIteminfo(int shopidx){
 		List<Map<String, Object>> iteminfo = managerMapper.getIteminfo(shopidx);
 		return iteminfo;
-	}
-	
-	/*
-	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회(2) -> 예약자 수 클릭시 예약자 정보와 예약한 상품 수, 구매 확정 여부 표시
-	 */
-	public List<Map<String, Object>> getReservationClient(int itemidx){
-		return managerMapper.getReservationClient(itemidx);
 	}
 	
 	/*
@@ -149,7 +140,7 @@ public class ManagerRepository {
 	/*
 	 * 해당 가게에서 상품을 구매해간 고객 정보 
 	 */
-	public List<Member> getReservationMember(int shopidx){
+	public List<Map<String, Object>> getReservationMember(int shopidx){
 		return managerMapper.getReservationMember(shopidx);
 	}
 	

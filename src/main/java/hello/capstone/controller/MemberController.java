@@ -145,29 +145,28 @@ public class MemberController {
       return "/";
    }
 	   
-	   /*
-	    * 회원정보 수정
-	    */
-	   @PutMapping("/update/info")
-	   public String updateInfo(@Validated(value = UpdateInfoValidationGroup.class) @RequestBody Member member, 
-	                      BindingResult bindingResult, HttpSession session) {
-	      
-	      if(bindingResult.hasErrors()) {
-	          Map<String, String> errors = new HashMap<>();
-	          for (FieldError error : bindingResult.getFieldErrors()) {
-		    		String em = messageSource.getMessage(error, Locale.getDefault());
-		            errors.put(error.getField(), em);
-	           }
-	          throw new ValidationException(errors);
-	       }
-	      
-	      Member oldMember = (Member) session.getAttribute("member");
-	      oldMember = memberService.updateMember(oldMember, member);
-	      
-	      session.setAttribute("member", oldMember);
-	      
-	      return "home_user";
-	   }
+   /*
+    * 회원정보 수정
+    */
+   @PutMapping("/update/info")
+   public String updateInfo(@RequestBody @Validated(value = UpdateInfoValidationGroup.class) Member member, BindingResult bindingResult, HttpSession session) {
+      
+      if(bindingResult.hasErrors()) {
+          Map<String, String> errors = new HashMap<>();
+          for (FieldError error : bindingResult.getFieldErrors()) {
+	    		String em = messageSource.getMessage(error, Locale.getDefault());
+	            errors.put(error.getField(), em);
+           }
+          throw new ValidationException(errors);
+       }
+      
+      Member oldMember = (Member) session.getAttribute("member");
+      oldMember = memberService.updateMember(oldMember, member);
+      
+      session.setAttribute("member", oldMember);
+      
+      return "home_user";
+   }
 	
 	
 	/*

@@ -13,7 +13,7 @@ public class Notice {
 	private String content;
 	private Timestamp noticeDate;
 	private String noticeModify; //수정됨 or null
-	
+	private int memberIdx;
 	public Notice() {
 		
 	}

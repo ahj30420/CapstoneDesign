@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -18,10 +20,12 @@ import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import hello.capstone.dto.Member;
+import hello.capstone.exception.AdminLoginException;
 import hello.capstone.exception.LogInException;
 import hello.capstone.exception.SignUpException;
 import hello.capstone.exception.errorcode.ErrorCode;
 import hello.capstone.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +57,6 @@ public class LoginService {
 		return memberRepository.save(member);
     	
 	}
-	
 
 	/*
 	 * 카카오 회원가입 - 
@@ -113,18 +116,28 @@ public class LoginService {
 	
 	
 	/*
-	 * 로그인 
+	 * 사용자 로그인 
 	 */
 	public Member login(String id, String pw) {
-		
-		
+
 		Member userMember = memberRepository.findById(id,"normal");
 		boolean pwCheck = passwordCheck(userMember, pw);
 
 		return userMember;
 	}
 	
-	
+	/*
+     * 관리자 페이지 로그인
+     */
+    public Member admin_login(String id, String pw) {
+    	
+    	Member AdminMember = memberRepository.findById(id,"normal");
+    	boolean pwCheck = passwordCheck(AdminMember, pw);
+    	boolean adCheck = AdminCheck(AdminMember);
+    	
+    	return AdminMember;
+    }
+
 	/*
 	 * 인증 메시지
 	 */
@@ -149,15 +162,22 @@ public class LoginService {
  *private 메소드
  *----------------------------------------------------------------------------------------------------- 	
  */
-	
-	//비밀번호 일치 확인
-	private boolean passwordCheck(Member userMember, String pw) {
-		boolean pwCheck = bCryptPasswordEncoder.matches(pw, userMember.getPw());
-		if(!pwCheck) {
-	    	  throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
-	      }
-		
-		return pwCheck;
+
+   //비밀번호 일치 확인
+   private boolean passwordCheck(Member userMember, String pw) {
+	 boolean pwCheck = bCryptPasswordEncoder.matches(pw, userMember.getPw());
+	 if(!pwCheck) {
+	     throw new LogInException(ErrorCode.PASSWORD_MISMATCH, null);
+	 }
+	   return pwCheck;
+	}
+   
+   //관리자인지 확인
+	private boolean AdminCheck(Member adminMember) {
+		if(!adminMember.getRole().equals("관리자")) {
+			throw new AdminLoginException(ErrorCode.NOT_ADMINISTER, null);
+		}
+		return true;
 	}
 	
 	//중복회원 검사

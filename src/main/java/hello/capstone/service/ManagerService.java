@@ -38,92 +38,90 @@ public class ManagerService {
 	private final ShopRepository shopRepository;
 
 	
-	//공지사항------------------------------------------------------------------------------------------
-	
 	/*
-	 * 공지사항 CREATE
-	 */
-	public void noticeCreate(Notice notice) {
-		
-		if(notice.getTitle() == null || notice.getTitle().isEmpty()) {
-			throw new NullTitleException(ErrorCode.NULL_TITLE,null);
-		}
-		if(notice.getContent() == null || notice.getTitle().isEmpty()) {
-			throw new NullContentException(ErrorCode.NULL_CONTENT,null);
-		}
-		
-		LocalDateTime dateTime = LocalDateTime.now();
-		Timestamp timestamp = Timestamp.valueOf(dateTime);
-		//MySql의 타임존을 반영하여 9시간을 더해줌.
-		Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
-		notice.setNoticeDate(now);
-		
-		managerRepository.noticeCreate(notice);
-	}
-	
-	/*
-	 * 공지사항 READ
-	 */
-	public Notice noticeRead(int noticeIdx, String title){
-		return managerRepository.noticeRead(noticeIdx, title);
-	}
-	
-	/*
-	 * 공지사항 UPDATE
-	 */
-	public void noticeUpdate(Notice newNotice) {
-		if(newNotice.getTitle() == null || newNotice.getTitle().isEmpty()) {
-			throw new NullTitleException(ErrorCode.NULL_TITLE,null);
-		}
-		if(newNotice.getContent() == null || newNotice.getTitle().isEmpty()) {
-			throw new NullContentException(ErrorCode.NULL_CONTENT,null);
-		}
-		
-		LocalDateTime dateTime = LocalDateTime.now();
-		Timestamp timestamp = Timestamp.valueOf(dateTime);
-		//MySql의 타임존을 반영하여 9시간을 더해줌.
-		Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
-		
-		newNotice.setNoticeModify("수정됨");
-		newNotice.setNoticeDate(now);
+    * 공지사항 CREATE
+    */
+   public void noticeCreate(Notice notice) {
+      
+      if(notice.getTitle() == null || notice.getTitle().isEmpty()) {
+         throw new NullTitleException(ErrorCode.NULL_TITLE,null);
+      }
+      if(notice.getContent() == null || notice.getTitle().isEmpty()) {
+         throw new NullContentException(ErrorCode.NULL_CONTENT,null);
+      }
+      
+      LocalDateTime dateTime = LocalDateTime.now();
+      Timestamp timestamp = Timestamp.valueOf(dateTime);
+      //MySql의 타임존을 반영하여 9시간을 더해줌.
+      Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
+      notice.setNoticeDate(now);
+      
+      managerRepository.noticeCreate(notice);
+   }
+   
+   /*
+    * 공지사항 READ
+    */
+   public Map<String,Object> noticeRead(int noticeIdx){
+      return managerRepository.noticeRead(noticeIdx);
+   }
+   
+   /*
+    * 공지사항 UPDATE
+    */
+   public void noticeUpdate(Notice newNotice) {
+      if(newNotice.getTitle() == null || newNotice.getTitle().isEmpty()) {
+         throw new NullTitleException(ErrorCode.NULL_TITLE,null);
+      }
+      if(newNotice.getContent() == null || newNotice.getTitle().isEmpty()) {
+         throw new NullContentException(ErrorCode.NULL_CONTENT,null);
+      }
+      
+      LocalDateTime dateTime = LocalDateTime.now();
+      Timestamp timestamp = Timestamp.valueOf(dateTime);
+      //MySql의 타임존을 반영하여 9시간을 더해줌.
+      Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
+      
+      newNotice.setNoticeModify("수정됨");
+      newNotice.setNoticeDate(now);
 
-		managerRepository.noticeUpdate(newNotice);
-	}
-	
-	/*
-	 * 공지사항 DELETE
-	 */
-	public void noticeDelete(Notice notice) {
-		managerRepository.noticeDelete(notice);
-	}
-	
-	/*
-	 * 모든 공지사항 READ
-	 */
-	public List<Notice> noticeReadAll(){
-		return managerRepository.noticeReadAll();
-	}
-	
-	/*
-	 * 공지사항 알림
-	 */
-	public List<Map<String, Object>> noticeGetAlarm(){
-		List<Map<String, Object>> notices = managerRepository.noticeGetAlarm();
-		//24시간 이전에 올라온 공지사항만 가져오기
-		for(Map<String, Object> notice : notices) {
-			
-			LocalDateTime dateTime = LocalDateTime.now();
-			Timestamp timestamp = Timestamp.valueOf(dateTime);
-			//MySql의 타임존을 반영하여 9시간을 더해줌.
-			Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
-			//시간단위로 차이 구하기
-	        int before = (int) ((now.getTime() - ((Timestamp)notice.get("noticedate")).getTime()) / (1000 * 60 * 60));
-	        
-	        notice.put("before", before);
-		}
-		return notices;
-	}
-	
+      managerRepository.noticeUpdate(newNotice);
+   }
+   
+   /*
+    * 공지사항 DELETE
+    */
+   public void noticeDelete(int noticeIdx) {
+      managerRepository.noticeDelete(noticeIdx);
+   }
+   
+   /*
+    * 모든 공지사항 READ
+    */
+   public List<Map<String, Object>> noticeReadAll(){
+      return managerRepository.noticeReadAll();
+   }
+   
+   /*
+    * 공지사항 알림
+    */
+   public List<Map<String, Object>> noticeGetAlarm(){
+      List<Map<String, Object>> notices = managerRepository.noticeGetAlarm();
+      //24시간 이전에 올라온 공지사항만 가져오기
+      for(Map<String, Object> notice : notices) {
+         
+         LocalDateTime dateTime = LocalDateTime.now();
+         Timestamp timestamp = Timestamp.valueOf(dateTime);
+         //MySql의 타임존을 반영하여 9시간을 더해줌.
+         Timestamp now = new Timestamp(timestamp.getTime() + (9 * 60 * 60 * 1000));
+         //시간단위로 차이 구하기
+           int before = (int) ((now.getTime() - ((Timestamp)notice.get("noticedate")).getTime()) / (1000 * 60 * 60));
+           
+           notice.put("before", before);
+      }
+      return notices;
+   }
+
 	//사용자 관리---------------------------------------------------------------------------------------
 	
 	/*
@@ -134,35 +132,21 @@ public class ManagerService {
 	}
 	
 	/*
-	 * 실패한 예약 조회(신뢰도가 깍인 예약)
-	 */
-	public List<Pair<Shop, String>> getFailedReservation(int memberIdx){
-		List<Pair<Shop, String>> shopAndDate = new ArrayList<Pair<Shop, String>>();
-		List<Reservation> failedReservations = managerRepository.getFailedReservation(memberIdx);
-		
-		//예약 내역에 있는 Shop가져오기, 예약 날짜 가져오기
-		for (Reservation fReservation : failedReservations) {
-			Shop shop = shopRepository.getShopByIdx(fReservation.getShopidx());
-			
-			Date reDate = fReservation.getRedate();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // 날짜 형식 지정
-	        String reserveDate = sdf.format(reDate);
-	        
-	        Pair<Shop, String> pair = Pair.of(shop, reserveDate);
-			shopAndDate.add(pair);
-		}
-		
-		return shopAndDate;
-		
-	}
-	
-	/*
-	 * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
-	 */
-	public List<Item> getFailedItems(int shopIdx){
-		
-		return managerRepository.getFailedItems(shopIdx);
-	}
+    * 실패한 예약 조회(신뢰도가 깎인 예약) 깎은 가게와 횟수
+    */
+   public List<Map<String, Object>> getFailedReservation(int memberIdx){
+      List<Map<String, Object>> failedReservations = managerRepository.getFailedReservation(memberIdx);
+
+      return failedReservations;
+   }
+   
+   /*
+    * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
+    */
+   public List<Map<String, Object>> getFailedItems(int shopIdx, int memberIdx){
+      
+      return managerRepository.getFailedItems(shopIdx, memberIdx);
+   }
 	
 	
 	
@@ -189,7 +173,7 @@ public class ManagerService {
 	/*
 	 * 모든 가게 정보 조회
 	 */
-	public List<Shop> getShopinfo(){
+	public List<Map<String, Object>> getShopinfo(){
 		return managerRepository.getShopinfo();
 	}
 	
@@ -199,13 +183,6 @@ public class ManagerService {
 	public List<Map<String, Object>> getIteminfo(int shopidx){
 		List<Map<String, Object>> iteminfo = managerRepository.getIteminfo(shopidx);
 		return iteminfo;
-	}
-	
-	/*
-	 * 해당 가게에 등록된 상품과 상품별 예약자 수 조회(2) -> 예약자 수 클릭시 예약자 정보와 예약한 상품 수, 구매 확정 여부 표시
-	 */
-	public List<Map<String, Object>> getReservationClient(int itemidx){
-		return managerRepository.getReservationClient(itemidx);
 	}
 	
 	/*
@@ -225,7 +202,7 @@ public class ManagerService {
 	/*
 	 * 해당 가게에서 상품을 구매해간 고객 정보 
 	 */
-	public List<Member> getReservationMember(int shopidx){
+	public List<Map<String, Object>> getReservationMember(int shopidx){
 		return managerRepository.getReservationMember(shopidx);
 	}
 	

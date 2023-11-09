@@ -52,7 +52,7 @@ public class ItemController {
 
    private final ItemService itemService;
    private final ShopService shopService;
-	private final MessageSource messageSource;
+   private final MessageSource messageSource;
    
    @Value("${itemfile.dir}")
    private String fileDir;

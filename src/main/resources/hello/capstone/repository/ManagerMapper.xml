@@ -4,45 +4,49 @@
 <mapper namespace="hello.capstone.repository.ManagerMapper">
    
 	<insert id = "noticeCreate">
-		insert into 
-		
-		notice(title, content, noticedate) 
-		
-		values( #{title}, #{content}, #{noticeDate}  );
-	</insert>
-	
-	
-	<select id = "noticeRead" resultType ="Notice">
-		select *
-		
-		from notice
-		
-		where noticeidx = #{noticeIdx} and title = #{title};
-	</select>
-	
-	<update id="noticeUpdate">
-		update notice
+      insert into 
+      
+      notice(title, content, noticedate, memberidx) 
+      
+      values( #{title}, #{content}, #{noticeDate}, #{memberIdx}  );
+   </insert>
+   
+   
+   <select id = "noticeRead" resultType ="Map">
+      select n.*, m.name
+      
+      from notice n 
+      
+      join member m on n.memberidx = m.memberidx
+      
+      where noticeidx = #{noticeIdx}
+   </select>
+   
+   <update id="noticeUpdate">
+      update notice
 
-		set title = #{title}, content = #{content}, noticedate =#{noticeDate}, noticemodify = #{noticeModify}
-		
-		where noticeidx = #{noticeIdx}
-	</update>
-	
-	<delete id ="noticeDelete">
-		delete
-		
-		from notice
-		
-		where noticeidx = #{noticeIdx}
-	</delete>
-	
-	<select id = "noticeReadAll" resultType ="Notice">
-		select *
-		
-		from notice
-		
-		order by noticedate;
-	</select>
+      set title = #{title}, content = #{content}, noticedate =#{noticeDate}, noticemodify = #{noticeModify}, memberidx = #{memberIdx}
+      
+      where noticeidx = #{noticeIdx}
+   </update>
+   
+   <delete id ="noticeDelete">
+      delete
+      
+      from notice
+      
+      where noticeidx = #{noticeIdx}
+   </delete>
+   
+   <select id = "noticeReadAll" resultType ="Map">
+      select n.*, m.name
+      
+      from notice n 
+      
+      join member m on n.memberidx = m.memberidx
+      
+      order by noticedate;
+   </select>
 	
 	<select id ="noticeGetAlarm" resultType ="Map">
 		select * from  notice
@@ -57,18 +61,22 @@
         order by name asc;;
    	</select>
    	
-    <select id="getFailedReservation" resultType = "Reservation">
-		select *
-		from reservation
-		where memberidx = #{memberIdx} and confirm = 'false';
-	</select>
-	
-	<select id = "getFailedItems" resultType = "Item">
-		select *
-		from item
-		where itemidx in 
-		(select itemidx from reservation where confirm = 'false' and shopidx = #{shopIdx});
-	</select>
+	<select id="getFailedReservation" resultType = "Map">
+	select s.*, SUM(CASE WHEN r.confirm = 'false' THEN 1 ELSE 0 END) as duplicateCount, r.memberidx
+	from shop s
+	join reservation r on s.shopidx = r.shopidx
+	where r.memberidx = #{memberIdx}
+	group by r.shopidx
+	order by s.shopname asc ;
+   </select>
+   
+   <select id = "getFailedItems" resultType = "Map">
+      select i.*, r.number, r.redate, r.confirm
+      from item i
+      join reservation r on i.itemidx = r.itemidx
+      where r.shopidx = #{shopIdx} and r.memberidx = #{memberIdx}
+      order by r.redate asc;
+   </select>
    	
    	
    	<select id = "getShopinfoByBusiness">
@@ -85,39 +93,25 @@
    		order by itemname asc;
    	</select>
    	
-   	<select id = "getShopinfo">
-   		select *
-   		from shop
- 		order by shopname asc;
+   	<select id = "getShopinfo" resultType="map">
+		select s.*, COUNT(CASE WHEN r.confirm != 'false' THEN r.reservationidx END) as reservater
+		from shop as s
+		left join reservation as r
+		on s.shopidx = r.shopidx
+		group by s.shopidx
+		order by shopname asc;
    	</select>
    	
    	<select id="getIteminfo" resultType="map">
-		select i.*,
-		       count(r.memberidx) as Reservation_client,
-		       sum(case when r.confirm &lt;&gt; 'false' then r.number else 0 end) as reservation_number,
-		       CASE 
-		           WHEN i.endtime &lt;= NOW() THEN '마감' 
-		           ELSE '진행중' 
-			   END AS status 
+		select i.itemidx, i.itemname, quantity, COUNT(CASE WHEN r.confirm != 'false' THEN r.reservationidx END) as reservater
 		from item as i
 		left join reservation as r
-		on i.itemidx = r.itemidx
-		where i.shopidx = 3
+		on r.itemidx = i.itemidx
+		where i.shopidx = #{shopidx}
 		group by i.itemidx
-		order by i.itemname asc;
+		order by itemname asc;
    	</select>
-   	
-   	<select id="getReservationClient" resultType="map">
-   		select m.*,
-		       r.number as  reservation_number,
-		       r.confirm
-		from member as m
-		left join reservation as r
-		on m.memberidx = r.memberidx
-		where r.itemidx = #{itemidx}
-		order by m.name asc;
-   	</select>
-   	
+
    	<select id="getRatingNumber" resultType="map">
 	   	SELECT r.rating, COALESCE(COUNT(rt.rating), 0) as rating_count
 		FROM (
@@ -143,14 +137,15 @@
 		order by m.name asc;
    	</select>
    	
-   	<select id="getReservationMember" resultType="Member">
-   		select m.* from member as m
-		left join reservation as r
-		on m.memberidx = r.memberidx
-		where r.shopidx = #{shopidx} and r.confirm = "true";
+   	<select id="getReservationMember" resultType="Map">
+		SELECT i.itemidx, i.itemname, m.memberidx, m.id, r.number, r.redate
+		FROM reservation r
+		JOIN member m ON r.memberidx = m.memberidx
+		JOIN item i ON r.itemidx = i.itemidx
+		WHERE r.shopidx = #{shopidx} and r.confirm != 'false';
    	</select>
    	
-   		<select id = "getItemAll" resultType ="Map">
+   	<select id = "getItemAll" resultType ="Map">
 		select i.*, s.shopname
 		from item i
 		inner join shop s on i.shopidx = s.shopidx
