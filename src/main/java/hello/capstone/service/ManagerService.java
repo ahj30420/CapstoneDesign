@@ -66,6 +66,7 @@ public class ManagerService {
       return managerRepository.noticeRead(noticeIdx);
    }
    
+   
    /*
     * 공지사항 UPDATE
     */
@@ -99,7 +100,13 @@ public class ManagerService {
     * 모든 공지사항 READ
     */
    public List<Map<String, Object>> noticeReadAll(){
-      return managerRepository.noticeReadAll();
+      List<Map<String, Object>> notices = managerRepository.noticeReadAll();
+      
+      for(Map<String, Object> notice : notices) {
+         Timestamp newRegisdate = new Timestamp(((Timestamp) notice.get("noticedate")).getTime() - (9 * 60 * 60 * 1000));
+         notice.put("noticedate", newRegisdate);
+      }
+      return notices;
    }
    
    /*
@@ -204,43 +211,6 @@ public class ManagerService {
 	 */
 	public List<Map<String, Object>> getReservationMember(int shopidx){
 		return managerRepository.getReservationMember(shopidx);
-	}
-	
-	
-	//검색---------------------------------------------------------------------------------------------------
-	
-	/*
-	 * 모든 아이템 나열
-	 */
-	public List<Map<String, Object>> getItemAll(){
-		
-		return managerRepository.getItemAll();
-	}
-	
-	
-	/*
-	 * 이름으로 회원검색 - 이름순, 날짜순
-	 */
-	public List<Member> searchMemberByName(String name){
-		return managerRepository.searchMemberByName(name);
-	}
-	
-	
-	/*
-	 * 이름으로 가게검색 - 이름순, 날짜순
-	 */
-	public List<Map<String, Object>> searchShopByName(String shopName){
-		return managerRepository.searchShopByName(shopName);
-	}
-	
-	
-	
-	/*
-	 * 이름으로 아이템검색 - 이름순, 날짜순
-	 */
-	public List<Map<String, Object>> searchItemByName( String itemName){
-		
-		return managerRepository.searchItemByName(itemName);
 	}
 	
 }

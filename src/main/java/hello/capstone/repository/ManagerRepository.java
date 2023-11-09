@@ -144,39 +144,4 @@ public class ManagerRepository {
 		return managerMapper.getReservationMember(shopidx);
 	}
 	
-	
-	
-	//검색---------------------------------------------------------------------------------------------------
-	
-	/*
-	 * 모든 아이템 나열
-	 */
-	public List<Map<String, Object>> getItemAll(){
-
-		return managerMapper.getItemAll();
-	}
-	
-	
-	/*
-	 * 이름으로 회원검색 - 이름순, 날짜순
-	 */
-	public List<Member> searchMemberByName(String name){
-		return managerMapper.searchMemberByName(name);
-	}
-	
-	
-	/*
-	 * 이름으로 가게검색 - 이름순, 날짜순
-	 */
-	public List<Map<String, Object>> searchShopByName(String shopName){
-		return managerMapper.searchShopByName(shopName);
-	}
-	
-	
-	/*
-	 * 이름으로 아이템검색 - 이름순, 날짜순
-	 */
-	public List<Map<String, Object>> searchItemByName(String itemName){
-		return managerMapper.searchItemByName(itemName);
-	}
 }

@@ -152,34 +152,5 @@
 		order by i.itemname asc , i.starttime asc;
 	
 	</select>
-	
-	
-	<select id ="searchMemberByName">
-		select *
-		from member
-		where name like concat('%', #{name}, '%')
-		order by name asc, redate asc;
-	
-	</select>
-	
-	<select id="searchShopByName">
-		select s.*, m.name
-		from shop s
-		inner join member m
-		on s.owneridx = m.memberidx
-		where s.shopname like concat('%', #{shopName}, '%')
-		order by s.shopname asc, s.registrationDate asc;
-	
-	</select>
-	
-	<select id="searchItemByName">
-		select i.*, s.shopname
-		from item i
-		inner join shop s
-		on i.shopidx = s.shopidx
-		where i.itemname like concat('%', #{itemName}, '%')
-		order by i.itemname asc, i.starttime asc;
-	
-	</select>
    	
 </mapper>

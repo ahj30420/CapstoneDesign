@@ -111,7 +111,7 @@ public class LoginController {
     	Member member = loginService.admin_login(id, pw);
     	HttpSession session = request.getSession();    	
     	
-    	session.setAttribute("member", member);
+    	session.setAttribute("AdminMember", member);
     	
     	return "/ad_user";
     }
@@ -141,7 +141,7 @@ public class LoginController {
     @GetMapping("/getSessionMember/manager")
     public Member getSessionMemberManager(HttpSession session) {
        
-       return (Member)session.getAttribute("member");
+       return (Member)session.getAttribute("AdminMember");
     }
     
     /*

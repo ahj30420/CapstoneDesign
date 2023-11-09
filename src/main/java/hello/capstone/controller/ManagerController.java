@@ -213,46 +213,4 @@ public class ManagerController {
 		return managerService.getReservationMember(shopidx);
 	}
 
-	
-	//검색---------------------------------------------------------------------------------------------------
-	
-	/*
-	 * 모든 아이템 나열
-	 */
-	@GetMapping("/item/all")
-	public List<Map<String, Object>> getItemAll(){
-		
-		return managerService.getItemAll();
-	}
-	
-	
-	/*
-	 * 이름으로 회원검색 - 이름순, 날짜순
-	 */
-	@GetMapping("/search/member")
-	public List<Member> searchMemberByName(@RequestParam("name") String name){
-		
-		return managerService.searchMemberByName(name);
-	}
-	
-	
-	/*
-	 * 이름으로 가게검색 - 이름순, 날짜순 주인이름 포함
-	 */
-	@GetMapping("/search/shop")
-	public List<Map<String, Object>> searchShopByName(@RequestParam("shopname") String shopName){
-		
-		return managerService.searchShopByName(shopName);
-	}
-	
-	
-	/*
-	 * 이름으로 아이템검색 - 이름순, 날짜순 가게이름 포함
-	 */
-	@GetMapping("/search/item")
-	public List<Map<String, Object>> searchItemByName(@RequestParam("itemname") String itemName){
-		
-		return managerService.searchItemByName(itemName);
-	}
-	
 }

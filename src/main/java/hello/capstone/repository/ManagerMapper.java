@@ -73,20 +73,4 @@ public interface ManagerMapper {
 	//해당 가게에서 상품을 구매해간 고객 정보
 	public List<Map<String, Object>> getReservationMember(int shopidx);
 	
-	
-	
-    //검색---------------------------------------------------------------------------------------------
-	
-	//모든 아이템 나열, 가게이름 포함
-	List<Map<String, Object>> getItemAll();
-	
-	//이름으로 회원 검색 - 이름 -> 날짜 순 정렬
-	List<Member> searchMemberByName(String name);
-	
-	//이름으로 가게 검색 - 이름 -> 날짜 순 정렬 , 가게 주인 포함
-	List<Map<String , Object>> searchShopByName(String shopName);
-	
-	//이름으로 아이템 검색 - 이름 -> 날짜 순 정렬, 가게 포함
-	List<Map<String, Object>> searchItemByName(String itemName);
-	
 }
