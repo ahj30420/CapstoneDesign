@@ -6,9 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import hello.capstone.dto.Ratings;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 @Repository
 @RequiredArgsConstructor
 public class RatingsRepository {

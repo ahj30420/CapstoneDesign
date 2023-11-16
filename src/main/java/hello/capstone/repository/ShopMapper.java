@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 
 @Mapper
@@ -17,8 +16,10 @@ public interface ShopMapper {
    
    void saveShop(Shop shop);
    
-   void shopDelete(int shopidx);
-  
+   void modifyShop(Shop shop);
+   
+   void deleteShop(int shopIdx);
+   
    int getShopIdx(Shop shop);
    
    //shop mark 테스트용
@@ -28,9 +29,9 @@ public interface ShopMapper {
    
    List<Shop> runPriceFilter(@Param("maxPrice") int maxPrice,@Param("minPrice") int minPrice);
    
-   void modifyShop(Shop shop);
-
    Shop getShopByIdx(@Param("shopidx") int shopidx);
+   
+   Shop getShopByItemIdx(@Param("itemidx") int itemidx);
    
    List<Shop> runRatingFilter(double rating);
    

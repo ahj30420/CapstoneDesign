@@ -99,31 +99,31 @@ public class ManagerController {
 
 	//사용자 관리---------------------------------------------------------------------------------------
 	/*
-	    * 일반 사용자 조회
-	    */
-	   @GetMapping("/member/user")
-	   public List<Member> getUserMember(){
-	      
-	      return managerService.getMemberByRole("사용자");
-	   }
-	   
-	   /*
-	    * 신뢰도를 깎은 가게와 예약 날짜 조회
-	    */
-	   @GetMapping("/member/user/trustmanage")
-	   public List<Map<String, Object>> trustManage(@RequestParam("memberIdx") int memberIdx){      
-	      
-	      return managerService.getFailedReservation(memberIdx);
-	   }
-	   
-	   /*
-	    * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
-	    */
-	   @GetMapping("/member/user/trustmanage/item")
-	   public List<Map<String, Object>> failItem(@RequestParam("shopidx") int shopIdx, @RequestParam("memberidx") int memberIdx  ){
-	   
-	      return managerService.getFailedItems(shopIdx,memberIdx);
-	   }
+    * 일반 사용자 조회
+    */
+   @GetMapping("/member/user")
+   public List<Member> getUserMember(){
+      
+      return managerService.getMemberByRole("사용자");
+   }
+   
+   /*
+    * 신뢰도를 깎은 가게와 예약 날짜 조회
+    */
+   @GetMapping("/member/user/trustmanage")
+   public List<Map<String, Object>> trustManage(@RequestParam("memberIdx") int memberIdx){      
+      
+      return managerService.getFailedReservation(memberIdx);
+   }
+   
+   /*
+    * 신뢰도를 깎은 가게에서 어떤 아이템을 예약했었는지 조회
+    */
+   @GetMapping("/member/user/trustmanage/item")
+   public List<Map<String, Object>> failItem(@RequestParam("shopidx") int shopIdx, @RequestParam("memberidx") int memberIdx  ){
+   
+      return managerService.getFailedItems(shopIdx,memberIdx);
+   }
 
 	
 	

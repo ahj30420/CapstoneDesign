@@ -5,11 +5,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import hello.capstone.dto.Member;
 import hello.capstone.dto.Shop;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-@Slf4j
+
 @Repository
 @RequiredArgsConstructor
 public class ShopRepository {
@@ -41,9 +39,14 @@ public class ShopRepository {
 		shopMapper.modifyShop(shop);
 	}
 	
-	public void shopDelete(int shopidx) {
-		shopMapper.shopDelete(shopidx);
+	/*
+	 * 매장 삭제
+	 */
+	public void deleteShop(int shopIdx) {
+		shopMapper.deleteShop(shopIdx);
 	}
+	
+	
 	
 	/*
 	 * shop 인덱스조회
@@ -59,6 +62,10 @@ public class ShopRepository {
 		
 	}
 	
+	public Shop getShopByItemIdx(int itemidx) {
+		return shopMapper.getShopByItemIdx(itemidx);
+	}
+	
 	/*
 	 * shop Mark표시 테스트 (모든 가게)
 	 */
@@ -70,15 +77,15 @@ public class ShopRepository {
 	/*
 	 * 상업자 본인이 올린 가게
 	 */
-	public List<Shop> getShopByMember(int memberidx){
-		return shopMapper.getShopByMember(memberidx);
+	public List<Shop> getShopByMember(int memberIdx){
+		return shopMapper.getShopByMember(memberIdx);
 	}
 	/*
-    * 가격 필터에 해당되는 가게 조회
-    */
-   public List<Shop> runPriceFilter(int maxPrice, int minPrice){
-      return shopMapper.runPriceFilter(maxPrice, minPrice);
-   }
+	 * 가격 필터에 해당되는 가게 조회
+	 */
+	public List<Shop> runPriceFilter(int maxPrice, int minPrice){
+		return shopMapper.runPriceFilter(maxPrice, minPrice);
+	}
 	
 	/*
 	 * 별점 필터에 해당되는 가게 조회
@@ -90,14 +97,14 @@ public class ShopRepository {
 	/*
 	 * 가게 별점 설정하기
 	 */
-	public void setRatings(int shopidx, double rating) {
-		shopMapper.setRatings(shopidx, rating);
+	public void setRatings(int shopIdx, double rating) {
+		shopMapper.setRatings(shopIdx, rating);
 	}
 	
-    /*
+	   /*
      * 해당 아이템 별로 예약자 리스트 조회
      */
-    public List<Map<String, Object>> getItemReservations(int itemidx){
-    	return shopMapper.getItemReservations(itemidx);
+    public List<Map<String, Object>> getItemReservations(int itemIdx){
+       return shopMapper.getItemReservations(itemIdx);
     }  
 }

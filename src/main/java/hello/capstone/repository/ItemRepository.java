@@ -2,23 +2,17 @@ package hello.capstone.repository;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import hello.capstone.dto.Alarm;
 import hello.capstone.dto.Item;
 import hello.capstone.dto.Member;
 import hello.capstone.dto.Reservation;
 import hello.capstone.dto.Shop;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Repository
 public class ItemRepository {
@@ -41,14 +35,6 @@ public class ItemRepository {
 	}
 	
 	/*
-	 * 인덱스로 아이템 가져오기
-	 */
-	public Item findByItemIdx(int itemIdx) {
-		return itemMapper.findByItemIdx(itemIdx);
-	}
-	
-	
-	/*
 	 * 상품 등록시 가게 고유 번호와 상품 이름으로 상품 중복 확인
 	 */
 	public Item findByShopIdxAndItemname(int shopidx, String itemname) {
@@ -57,12 +43,17 @@ public class ItemRepository {
 	
 	
 	/*
-	 * 해당 가게에서 마감되지 않은 모든 아이템 정보
+	 * 해당 가게의 모든 아이템 정보
 	 */
-	public List<Item> getItems(int shopidx){
-		
-		
-		return itemMapper.getItems(shopidx); 
+	public List<Item> getItems(int shopIdx){
+		return itemMapper.getItems(shopIdx); 
+	}
+	
+	/*
+	 * 인덱스로 아이템 가져오기
+	 */
+	public Item findByItemIdx(int itemIdx) {
+		return itemMapper.findByItemIdx(itemIdx);
 	}
 
 	/*
@@ -71,14 +62,14 @@ public class ItemRepository {
 	public void itemDelete(Item item) {
 		 itemMapper.itemDelete(item);
 	}
-	
+	 
     /*
     * 예약자가 있는 상품인지 확인
     */
 	public int reservationCheck(Item item) {
 		return itemMapper.reservationCheck(item);
 	}
-	
+	 
 	/*
 	 * 알림 등록
 	 */
@@ -91,7 +82,8 @@ public class ItemRepository {
 	 * 알림 가져오기
 	 */
 	public List<Map<String, Object>> getAlarm(int memberidx) {
-		return itemMapper.getAlarm(memberidx);   
+		return itemMapper.getAlarm(memberidx);
+		   
 	}
 	
 	/*
@@ -140,6 +132,7 @@ public class ItemRepository {
 		itemMapper.increaseQuantity(itemidx, number);
 	}
 	
+	
 	/*
      * 예약 상품 리스트 조회
      */
@@ -150,11 +143,11 @@ public class ItemRepository {
     /*
 	 * 상품 예약 취소(상업자)
 	 */
-    public void reservationCancelBusiness(int reservationIdx ,Integer itemidx, Integer number) {
+    public void reservationCancelBusiness(int reservationIdx) {
     	itemMapper.reservationCancelBusiness(reservationIdx);
-    	itemMapper.increaseQuantity(itemidx, number);
     }
-	
+    
+    
 	/*
 	 * 예약자 실제 상품 결제 확인하여 신뢰점수 차감
 	 */
@@ -164,4 +157,8 @@ public class ItemRepository {
 		itemMapper.decreaseTrust(time);
 		itemMapper.setConfirmToFalse(time);
 	}
+	
+	
+	
+	
 }
