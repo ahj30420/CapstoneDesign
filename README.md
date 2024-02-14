@@ -1,12 +1,21 @@
-# 재고30
-
-## 상품 온라인 예약서비스
+# 재고30 <br> 상품 온라인 예약서비스
 
 ### 프로젝트 기간
 2023.09.12 ~ 2023.11.12 (2개월)
 ### 개발 인원
 4인 팀프로젝트 - FE(2명),BE(2명)
 
+### 핵심 로직
+- 소셜 로그인 구현**(네이버,카카오)**
+- 아이디,비밀번호 찾기 시 문자 인증 구현
+- 회원가입 시 비밀번호 암호화 및 입력값 Validation
+- 역할 별 인증, 인가 Interceptor
+- 특정 조건에 맞게 필터링 기능
+- 가게, 아이템, 공지사항, 1:1문의 CRUD 및 입력값 Validation
+- 즐겨찾기한 가게 or 공지사항 등록 시 알림 기능
+- 관리자 페이지
+<hr>
+  
 ![1](https://github.com/ahj30420/CapstoneDesign/assets/79964990/4b9890be-cb6d-41d9-b941-bbe1bd94aa1a)
 ![2](https://github.com/ahj30420/CapstoneDesign/assets/79964990/2f0d77a6-153a-46ac-8fbf-6c0b2d921838)
 ![3](https://github.com/ahj30420/CapstoneDesign/assets/79964990/dc3eb1de-a24f-4cbc-964b-d3529b68bc44)
